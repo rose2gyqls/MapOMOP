@@ -1,0 +1,251 @@
+# MapOMOP 통합 Docker Compose
+# 병원 내부망 배포용 전체 서비스 구성
+#
+# 서비스 구성:
+#   - elasticsearch: OMOP CDM 데이터 저장 및 검색
+#   - sapbert: 의료 용어 임베딩 API
+#   - mapomop: 매핑 API 서버
+#
+# 사용법:
+#   # 전체 서비스 시작 (GPU)
+#   docker compose up -d
+#
+#   # CPU 전용
+#   docker compose --profile cpu-only up -d
+#
+#   # 개발 모드
+#   docker compose --profile dev up -d
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # Elasticsearch - OMOP CDM 데이터 저장소
+  # ============================================================================
+  elasticsearch:
+    image: elasticsearch:8.18.0
+    container_name: mapomop-elasticsearch
+    restart: unless-stopped
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=mapomop-cluster
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ES_PASSWORD:-snomed}
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=basic
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - "${ES_PORT:-9200}:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -qE '\"status\":\"(green|yellow)\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - mapomop-network
+
+  # ============================================================================
+  # Kibana - Elasticsearch 시각화 (선택사항)
+  # ============================================================================
+  kibana:
+    image: kibana:8.18.0
+    container_name: mapomop-kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ES_PASSWORD:-snomed}
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - mapomop-network
+    profiles:
+      - dev
+      - monitoring
+
+  # ============================================================================
+  # SapBERT API - 의료 용어 임베딩 (GPU)
+  # ============================================================================
+  sapbert:
+    build:
+      context: ./sapbert-api
+      dockerfile: Dockerfile
+    image: mapomop/sapbert-api:latest
+    container_name: mapomop-sapbert
+    restart: unless-stopped
+    environment:
+      - SAPBERT_MODEL_PATH=/app/models
+      - SAPBERT_MAX_LENGTH=${SAPBERT_MAX_LENGTH:-25}
+      - SAPBERT_BATCH_SIZE=${SAPBERT_BATCH_SIZE:-128}
+      - SAPBERT_DEVICE=auto
+    volumes:
+      - ./volumes/sapbert_models:/app/models:ro
+    ports:
+      - "${SAPBERT_PORT:-8000}:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - mapomop-network
+
+  # ============================================================================
+  # SapBERT API - CPU 버전
+  # ============================================================================
+  sapbert-cpu:
+    build:
+      context: ./sapbert-api
+      dockerfile: Dockerfile.cpu
+    image: mapomop/sapbert-api:cpu
+    container_name: mapomop-sapbert-cpu
+    restart: unless-stopped
+    environment:
+      - SAPBERT_MODEL_PATH=/app/models
+      - SAPBERT_MAX_LENGTH=${SAPBERT_MAX_LENGTH:-25}
+      - SAPBERT_BATCH_SIZE=${SAPBERT_BATCH_SIZE:-32}
+      - SAPBERT_DEVICE=cpu
+    volumes:
+      - ./volumes/sapbert_models:/app/models:ro
+    ports:
+      - "${SAPBERT_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks:
+      - mapomop-network
+    profiles:
+      - cpu-only
+
+  # ============================================================================
+  # MapOMOP API - 매핑 서버 (GPU)
+  # ============================================================================
+  mapomop:
+    build:
+      context: ./MapOMOP
+      dockerfile: Dockerfile
+    image: mapomop/mapomop-api:latest
+    container_name: mapomop-api
+    restart: unless-stopped
+    environment:
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USERNAME=${ES_USERNAME:-elastic}
+      - ES_PASSWORD=${ES_PASSWORD:-snomed}
+      - SAPBERT_URL=http://sapbert:8000
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-qwen}
+      - LOCAL_LLM_PATH=/app/llm-models
+      - SCORING_MODE=${SCORING_MODE:-local_llm}
+      - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.5}
+    volumes:
+      - ./volumes/llm-weights:/app/llm-models:ro
+      - mapomop-logs:/app/logs
+    ports:
+      - "${MAPOMOP_PORT:-8080}:8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      sapbert:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - mapomop-network
+
+  # ============================================================================
+  # MapOMOP API - CPU 버전
+  # ============================================================================
+  mapomop-cpu:
+    build:
+      context: ./MapOMOP
+      dockerfile: Dockerfile.cpu
+    image: mapomop/mapomop-api:cpu
+    container_name: mapomop-api-cpu
+    restart: unless-stopped
+    environment:
+      - ES_HOST=elasticsearch
+      - ES_PORT=9200
+      - ES_USERNAME=${ES_USERNAME:-elastic}
+      - ES_PASSWORD=${ES_PASSWORD:-snomed}
+      - SAPBERT_URL=http://sapbert-cpu:8000
+      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-qwen}
+      - LOCAL_LLM_PATH=/app/llm-models
+      - SCORING_MODE=${SCORING_MODE:-local_llm}
+      - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.5}
+    volumes:
+      - ./volumes/llm-weights:/app/llm-models:ro
+      - mapomop-logs:/app/logs
+    ports:
+      - "${MAPOMOP_PORT:-8080}:8080"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      sapbert-cpu:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - mapomop-network
+    profiles:
+      - cpu-only
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  es-data:
+    driver: local
+  mapomop-logs:
+    driver: local
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  mapomop-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+

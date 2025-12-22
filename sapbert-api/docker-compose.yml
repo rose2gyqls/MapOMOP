@@ -1,0 +1,75 @@
+# SapBERT API Docker Compose
+# Standalone configuration for SapBERT service
+
+version: '3.8'
+
+services:
+  sapbert:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sapbert-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # 로컬 모델 경로 사용 (오프라인 환경)
+      - SAPBERT_MODEL_PATH=/app/models
+      - SAPBERT_MODEL_NAME=cambridgeltl/SapBERT-from-PubMedBERT-fulltext
+      - SAPBERT_MAX_LENGTH=25
+      - SAPBERT_BATCH_SIZE=128
+      - SAPBERT_DEVICE=auto
+    volumes:
+      # 사전 다운로드된 SapBERT 모델 마운트
+      - ../volumes/sapbert_models:/app/models:ro
+    # GPU support (uncomment if using GPU)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - mapomop-network
+
+  # CPU-only version (alternative)
+  sapbert-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    container_name: sapbert-api-cpu
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # 로컬 모델 경로 사용 (오프라인 환경)
+      - SAPBERT_MODEL_PATH=/app/models
+      - SAPBERT_MODEL_NAME=cambridgeltl/SapBERT-from-PubMedBERT-fulltext
+      - SAPBERT_MAX_LENGTH=25
+      - SAPBERT_BATCH_SIZE=32
+      - SAPBERT_DEVICE=cpu
+    volumes:
+      # 사전 다운로드된 SapBERT 모델 마운트
+      - ../volumes/sapbert_models:/app/models:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks:
+      - mapomop-network
+    profiles:
+      - cpu-only
+
+networks:
+  mapomop-network:
+    driver: bridge
+

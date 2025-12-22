@@ -1,0 +1,11 @@
+# 데이터 적재 파이프라인 1
+- pipeline.id: main
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: '/usr/share/logstash/pipeline/logstash-main.conf'
+
+# 데이터 적재 파이프라인 2
+- pipeline.id: call
+  pipeline.workers: 1
+  pipeline.batch.size: 1
+  path.config: '/usr/share/logstash/pipeline/logstash-call.conf'

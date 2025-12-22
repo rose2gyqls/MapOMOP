@@ -1,0 +1,72 @@
+services:
+  es:
+    image: elasticsearch:8.18.0
+    environment:
+      - node.name=es
+      - discovery.type=single-node # single-node 로 만든다.
+      - discovery.seed_hosts=es
+      - ELASTIC_PASSWORD=iamanywhere1
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.http.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.license.self_generated.type=basic
+    mem_limit: 1073741824
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s --cacert config/certs/ca/ca.crt http://localhost:9200 | grep -q 'missing authentication credentials'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 120
+    volumes:
+      - es-data:/usr/share/es/data
+      - certs:/usr/share/elasticsearch/config/certs
+    ports:
+      - 9200:9200
+
+  kibana:
+    image: kibana:8.18.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://es:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - es
+
+  logstash:
+      image: logstash:8.18.0
+      environment:
+        - DB_HOST=localhost
+        - DB_PORT=3306
+        - DB_DATABASE=omop_v5
+        - DB_USERNAME=root
+        - DB_PASSWORD=
+        - xpack.monitoring.enabled=false
+        - xpack.monitoring.elasticsearch.hosts=["http://es:9200"]
+        - http.host=0.0.0.0
+        - http.port=9600
+        - path.data=/usr/share/logstash/data
+
+      volumes:
+        - ./logstash/mysql-connector-j-9.3.0.jar/:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.3.0.jar # mysql 사용을 위한 jdbc-connector 다운
+        - ./logstash/config:/usr/share/logstash/config
+        - ./logstash/pipeline:/usr/share/logstash/pipeline
+      ports:
+        - 9600:9600
+      depends_on: 
+        - es
+
+volumes:
+  certs:
+    driver: local
+  es-data:
+    driver: local

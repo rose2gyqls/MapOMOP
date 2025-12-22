@@ -1,0 +1,59 @@
+# SapBERT API Server Dockerfile (CPU-only version)
+# Use this for environments without GPU
+
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONIOENCODING=UTF-8 \
+    TZ=Asia/Seoul
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies (CPU-only PyTorch)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app.py .
+
+# Create directories for models
+RUN mkdir -p /app/models /app/hf_cache
+
+# Create non-root user for security
+RUN useradd --create-home --shell /bin/bash appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
+# Environment variables
+# SAPBERT_MODEL_PATH: 로컬 모델 경로 (볼륨 마운트 시 사용)
+ENV SAPBERT_MODEL_PATH="/app/models" \
+    SAPBERT_MODEL_NAME="cambridgeltl/SapBERT-from-PubMedBERT-fulltext" \
+    SAPBERT_MAX_LENGTH=25 \
+    SAPBERT_BATCH_SIZE=32 \
+    SAPBERT_DEVICE=cpu \
+    SAPBERT_HOST=0.0.0.0 \
+    SAPBERT_PORT=8000 \
+    HF_HOME=/app/hf_cache \
+    TRANSFORMERS_CACHE=/app/hf_cache
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run the application
+CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
