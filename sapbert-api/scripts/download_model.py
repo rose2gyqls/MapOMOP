@@ -1,178 +1,272 @@
 #!/usr/bin/env python3
 """
-SapBERT 모델 사전 다운로드 스크립트
+SapBERT Model Download Script
 
-오프라인 환경(병원 내부망)에서 사용하기 위해
-모델을 미리 다운로드하여 저장합니다.
+Downloads SapBERT model from HuggingFace and saves it locally.
+Designed for offline environments (e.g., hospital internal networks).
 
-사용법:
-    python download_model.py [--output-dir ./sapbert-model]
+Usage:
+    # Download model to default location (volumes/sapbert_models)
+    python download_model.py
+
+    # Download to custom directory
+    python download_model.py --output-dir ./custom-path
+
+    # Download and verify
+    python download_model.py --verify
+
+    # Verify existing model only
+    python download_model.py --verify-only /path/to/model
 """
 
 import argparse
 import os
 import sys
 from pathlib import Path
+from typing import Optional
+
+try:
+    from transformers import AutoModel, AutoTokenizer
+    import torch
+except ImportError:
+    print("Error: Required libraries not installed.")
+    print("Install with: pip install transformers torch")
+    sys.exit(1)
 
 
-def download_model(model_name: str, output_dir: str) -> bool:
+def get_default_output_dir() -> Path:
     """
-    HuggingFace에서 모델을 다운로드하여 로컬에 저장합니다.
+    Get default output directory relative to project root.
     
-    Args:
-        model_name: HuggingFace 모델명
-        output_dir: 저장 디렉토리
-        
     Returns:
-        성공 여부
+        Path to volumes/sapbert_models directory
     """
-    try:
-        from transformers import AutoModel, AutoTokenizer
-    except ImportError:
-        print("Error: transformers 라이브러리가 설치되지 않았습니다.")
-        print("설치: pip install transformers torch")
-        return False
-    
+    # Script is in sapbert-api/scripts/, so go up to project root
+    script_dir = Path(__file__).parent
+    project_root = script_dir.parent.parent
+    return project_root / "volumes" / "sapbert_models"
+
+
+def format_size(size_bytes: int) -> str:
+    """Format file size in human-readable format."""
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.2f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.2f} PB"
+
+
+def calculate_directory_size(directory: Path) -> int:
+    """Calculate total size of all files in directory."""
+    return sum(f.stat().st_size for f in directory.rglob("*") if f.is_file())
+
+
+def download_model(
+    model_name: str,
+    output_dir: str,
+    device: str = "auto"
+) -> bool:
+    """
+    Download model from HuggingFace and save to local directory.
+
+    Args:
+        model_name: HuggingFace model identifier
+        output_dir: Local directory to save the model
+        device: Device to load model on (auto, cpu, cuda)
+
+    Returns:
+        True if successful, False otherwise
+    """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
-    print(f"모델 다운로드 중: {model_name}")
-    print(f"저장 경로: {output_path.absolute()}")
-    print("-" * 50)
-    
+
+    print(f"\n{'='*60}")
+    print(f"Downloading: {model_name}")
+    print(f"Output path: {output_path.absolute()}")
+    print('='*60)
+
     try:
-        # Tokenizer 다운로드
-        print("Tokenizer 다운로드 중...")
+        # Download tokenizer
+        print("Downloading tokenizer...")
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         tokenizer.save_pretrained(output_path)
-        print("✓ Tokenizer 저장 완료")
-        
-        # Model 다운로드
-        print("Model 다운로드 중...")
-        model = AutoModel.from_pretrained(model_name)
+        print("✓ Tokenizer saved")
+
+        # Download model
+        print("Downloading model... (this may take a while)")
+        model = AutoModel.from_pretrained(
+            model_name,
+            device_map=device if device != "auto" else None
+        )
         model.save_pretrained(output_path)
-        print("✓ Model 저장 완료")
-        
-        # 파일 목록 출력
-        print("-" * 50)
-        print("저장된 파일:")
+        print("✓ Model saved")
+
+        # List downloaded files
+        print("\n" + "-" * 60)
+        print("Downloaded files:")
         total_size = 0
-        for file in output_path.iterdir():
-            size = file.stat().st_size
-            total_size += size
-            size_mb = size / (1024 * 1024)
-            print(f"  {file.name}: {size_mb:.2f} MB")
-        
-        print("-" * 50)
-        print(f"총 크기: {total_size / (1024 * 1024):.2f} MB")
-        print(f"\n모델이 {output_path.absolute()}에 저장되었습니다.")
-        print("\n오프라인 환경에서 사용하려면:")
-        print(f"  SAPBERT_MODEL_PATH={output_path.absolute()}")
-        
+        for file in sorted(output_path.iterdir()):
+            if file.is_file():
+                size = file.stat().st_size
+                total_size += size
+                print(f"  {file.name}: {format_size(size)}")
+
+        print("-" * 60)
+        print(f"Total size: {format_size(total_size)}")
+        print(f"\nModel saved to: {output_path.absolute()}")
+        print("\nFor offline usage, set environment variable:")
+        print(f"  export SAPBERT_MODEL_PATH={output_path.absolute()}")
+
         return True
-        
+
     except Exception as e:
-        print(f"Error: 모델 다운로드 실패 - {e}")
+        print(f"✗ Download failed: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
 def verify_model(model_path: str) -> bool:
     """
-    저장된 모델이 정상적으로 로드되는지 확인합니다.
-    
+    Verify that a saved model can be loaded and used correctly.
+
     Args:
-        model_path: 모델 경로
-        
+        model_path: Path to the model directory
+
     Returns:
-        검증 성공 여부
+        True if verification successful, False otherwise
     """
-    try:
-        from transformers import AutoModel, AutoTokenizer
-    except ImportError:
-        print("Error: transformers 라이브러리가 필요합니다.")
+    model_path_obj = Path(model_path)
+    
+    if not model_path_obj.exists():
+        print(f"✗ Model path does not exist: {model_path}")
         return False
-    
-    print(f"\n모델 검증 중: {model_path}")
-    
+
+    print(f"\n{'='*60}")
+    print(f"Verifying model: {model_path}")
+    print('='*60)
+
     try:
+        # Load tokenizer and model
+        print("Loading tokenizer...")
         tokenizer = AutoTokenizer.from_pretrained(model_path)
+        print("✓ Tokenizer loaded")
+
+        print("Loading model...")
         model = AutoModel.from_pretrained(model_path)
-        
-        # 테스트 임베딩 생성
-        import torch
-        
+        print("✓ Model loaded")
+
+        # Test embedding generation
+        print("\nTesting embedding generation...")
         test_text = "myocardial ischemia"
         inputs = tokenizer(
-            test_text, 
-            return_tensors="pt", 
-            padding=True, 
-            truncation=True, 
+            test_text,
+            return_tensors="pt",
+            padding=True,
+            truncation=True,
             max_length=25
         )
-        
+
         with torch.no_grad():
             outputs = model(**inputs)
             embedding = outputs.last_hidden_state[:, 0, :].numpy()
-        
-        print(f"✓ 모델 로드 성공")
-        print(f"✓ 테스트 텍스트: '{test_text}'")
-        print(f"✓ 임베딩 차원: {embedding.shape[1]}")
-        print(f"✓ 검증 완료")
-        
+
+        print(f"✓ Test text: '{test_text}'")
+        print(f"✓ Embedding dimension: {embedding.shape[1]}")
+        print(f"✓ Embedding shape: {embedding.shape}")
+        print("\n✓ Verification successful")
+
         return True
-        
+
     except Exception as e:
-        print(f"✗ 모델 검증 실패: {e}")
+        print(f"✗ Verification failed: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
 def main():
+    """Main function."""
     parser = argparse.ArgumentParser(
-        description='SapBERT 모델 다운로드 스크립트'
+        description="Download SapBERT model from HuggingFace",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Download to default location (volumes/sapbert_models)
+  python download_model.py
+
+  # Download to custom directory
+  python download_model.py --output-dir ./my-models
+
+  # Download and verify
+  python download_model.py --verify
+
+  # Verify existing model only
+  python download_model.py --verify-only /path/to/model
+        """
     )
+
     parser.add_argument(
         '--model-name',
+        type=str,
         default='cambridgeltl/SapBERT-from-PubMedBERT-fulltext',
-        help='HuggingFace 모델명'
+        help='HuggingFace model identifier (default: cambridgeltl/SapBERT-from-PubMedBERT-fulltext)'
     )
     parser.add_argument(
         '--output-dir',
-        default='./sapbert-model',
-        help='모델 저장 디렉토리'
+        type=str,
+        default=None,
+        help='Output directory for model (default: volumes/sapbert_models)'
     )
     parser.add_argument(
         '--verify',
         action='store_true',
-        help='다운로드 후 모델 검증'
+        help='Verify model after download'
     )
     parser.add_argument(
         '--verify-only',
         type=str,
         metavar='PATH',
-        help='기존 모델 검증만 수행'
+        help='Verify existing model only (skip download)'
     )
-    
+    parser.add_argument(
+        '--device',
+        type=str,
+        default='auto',
+        choices=['auto', 'cpu', 'cuda'],
+        help='Device to load model on (default: auto)'
+    )
+
     args = parser.parse_args()
-    
-    # 검증만 수행
+
+    # Verify only mode
     if args.verify_only:
         success = verify_model(args.verify_only)
         sys.exit(0 if success else 1)
-    
-    # 모델 다운로드
-    success = download_model(args.model_name, args.output_dir)
-    
+
+    # Determine output directory
+    if args.output_dir:
+        output_dir = Path(args.output_dir)
+    else:
+        output_dir = get_default_output_dir()
+
+    # Download model
+    success = download_model(
+        model_name=args.model_name,
+        output_dir=str(output_dir),
+        device=args.device
+    )
+
     if not success:
         sys.exit(1)
-    
-    # 검증
+
+    # Verify if requested
     if args.verify:
-        success = verify_model(args.output_dir)
+        success = verify_model(str(output_dir))
         sys.exit(0 if success else 1)
-    
+
     sys.exit(0)
 
 
 if __name__ == "__main__":
     main()
-

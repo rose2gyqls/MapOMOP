@@ -107,10 +107,9 @@ volumes/es-data/
 volumes/llm-weights/*.safetensors
 volumes/llm-weights/**/*.safetensors
 volumes/llm-weights/hari-q3-8b/
-volumes/llm-weights/qwen2.5-0.5b-instruct/
-volumes/llm-weights/tinyllama-1.1b-chat/
+volumes/llm-weights/qwen2.5-3b/
+volumes/llm-weights/gemma-2-2b/
 volumes/sapbert_models/*.safetensors
-volumes/sapbert_models/
 
 # Docker images
 *.tar

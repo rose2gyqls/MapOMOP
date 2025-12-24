@@ -1,123 +1,279 @@
 #!/usr/bin/env python3
 """
-sLLM 모델 다운로드 스크립트
-로컬 구동 가능한 작은 모델들을 다운로드합니다.
+HuggingFace Model Download Script
 
-모델 목록:
-1. Qwen2.5-1.5B-Instruct (약 3GB)
-2. Llama-3.2-1B-Instruct (약 2.5GB) 
-3. SNUH/Hari 모델 (HuggingFace에서 확인 필요)
+Downloads LLM models from HuggingFace and saves them locally.
+Supports downloading multiple models or individual models via command line.
+
+Usage:
+    # Download all models
+    python download_models.py
+
+    # Download specific model
+    python download_models.py --model gemma-2-2b
+
+    # Download to custom directory
+    python download_models.py --output-dir /path/to/models
 """
 
+import argparse
 import os
 import sys
 from pathlib import Path
+from typing import Dict, List, Optional
 
-def download_model(model_name: str, output_dir: str, trust_remote_code: bool = False):
-    """HuggingFace에서 모델 다운로드"""
+try:
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    
+except ImportError:
+    print("Error: transformers library not installed.")
+    print("Install with: pip install transformers torch")
+    sys.exit(1)
+
+
+# Model configurations
+MODEL_CONFIGS: List[Dict[str, any]] = [
+    {
+        "id": "gemma-2-2b",
+        "name": "google/gemma-2-2b",
+        "trust_remote_code": False,
+        "description": "Google Gemma 2 2B model"
+    },
+    {
+        "id": "hari-q3-8b",
+        "name": "snuh/hari-q3-8b",
+        "trust_remote_code": True,
+        "description": "SNUH Hari Q3 8B model"
+    },
+    {
+        "id": "qwen2.5-3b",
+        "name": "Qwen/Qwen2.5-3B",
+        "trust_remote_code": True,
+        "description": "Qwen2.5 3B model"
+    }
+]
+
+
+def get_model_config(model_id: str) -> Optional[Dict[str, any]]:
+    """Get model configuration by ID."""
+    for config in MODEL_CONFIGS:
+        if config["id"] == model_id:
+            return config
+    return None
+
+
+def format_size(size_bytes: int) -> str:
+    """Format file size in human-readable format."""
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.2f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.2f} PB"
+
+
+def calculate_directory_size(directory: Path) -> int:
+    """Calculate total size of all files in directory."""
+    return sum(f.stat().st_size for f in directory.rglob("*") if f.is_file())
+
+
+def download_model(
+    model_name: str,
+    output_dir: str,
+    trust_remote_code: bool = False,
+    device: str = "auto"
+) -> bool:
+    """
+    Download model from HuggingFace and save to local directory.
+
+    Args:
+        model_name: HuggingFace model identifier
+        output_dir: Local directory to save the model
+        trust_remote_code: Whether to trust remote code in model config
+        device: Device to load model on (auto, cpu, cuda)
+
+    Returns:
+        True if successful, False otherwise
+    """
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
+
     print(f"\n{'='*60}")
-    print(f"다운로드 중: {model_name}")
-    print(f"저장 경로: {output_path}")
+    print(f"Downloading: {model_name}")
+    print(f"Output path: {output_path.absolute()}")
     print('='*60)
-    
+
     try:
-        # Tokenizer 다운로드
-        print("Tokenizer 다운로드 중...")
+        # Download tokenizer
+        print("Downloading tokenizer...")
         tokenizer = AutoTokenizer.from_pretrained(
             model_name,
             trust_remote_code=trust_remote_code
         )
         tokenizer.save_pretrained(output_path)
-        print("✓ Tokenizer 저장 완료")
-        
-        # Model 다운로드
-        print("Model 다운로드 중... (시간이 걸릴 수 있습니다)")
+        print("✓ Tokenizer saved")
+
+        # Download model
+        print("Downloading model... (this may take a while)")
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             trust_remote_code=trust_remote_code,
             torch_dtype="auto",
-            low_cpu_mem_usage=True
+            low_cpu_mem_usage=True,
+            device_map=device
         )
         model.save_pretrained(output_path)
-        print("✓ Model 저장 완료")
-        
-        # 파일 크기 확인
-        total_size = sum(f.stat().st_size for f in output_path.rglob("*") if f.is_file())
-        print(f"총 크기: {total_size / (1024**3):.2f} GB")
-        
+        print("✓ Model saved")
+
+        # Calculate and display size
+        total_size = calculate_directory_size(output_path)
+        print(f"Total size: {format_size(total_size)}")
+
         return True
-        
+
     except Exception as e:
-        print(f"✗ 다운로드 실패: {e}")
+        print(f"✗ Download failed: {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 
+def list_available_models():
+    """List all available model configurations."""
+    print("Available models:")
+    print("-" * 60)
+    for i, config in enumerate(MODEL_CONFIGS, 1):
+        print(f"  {i}. {config['id']}")
+        print(f"     Name: {config['name']}")
+        print(f"     Description: {config['description']}")
+        print()
+
+
+def list_downloaded_models(base_dir: Path):
+    """List all downloaded models in the base directory."""
+    print("\n" + "="*60)
+    print("Downloaded Models")
+    print("="*60)
+    
+    models_found = False
+    for d in sorted(base_dir.iterdir()):
+        if d.is_dir() and d.name != "__pycache__":
+            size = calculate_directory_size(d)
+            print(f"  {d.name}: {format_size(size)}")
+            models_found = True
+    
+    if not models_found:
+        print("  No models found.")
+
+
 def main():
-    base_dir = Path(__file__).parent
+    """Main function."""
+    parser = argparse.ArgumentParser(
+        description="Download HuggingFace models locally",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Download all models
+  python download_models.py
+
+  # Download specific model
+  python download_models.py --model gemma-2-2b
+
+  # Download to custom directory
+  python download_models.py --output-dir /path/to/models
+
+  # List available models
+  python download_models.py --list
+        """
+    )
     
-    # 다운로드할 모델 목록
-    models = [
-        {
-            "name": "Qwen/Qwen2.5-0.5B-Instruct",
-            "output_dir": base_dir / "qwen2.5-0.5b-instruct",
-            "trust_remote_code": True,
-            "description": "Qwen2.5 0.5B - 가장 작은 Qwen 모델"
-        },
-        {
-            "name": "meta-llama/Llama-3.2-1B-Instruct",
-            "output_dir": base_dir / "llama-3.2-1b-instruct",
-            "trust_remote_code": False,
-            "description": "Llama 3.2 1B - 작은 Llama 모델"
-        },
-        {
-            "name": "beomi/Llama-3-Open-Ko-8B-Instruct-preview",
-            "output_dir": base_dir / "llama-3-ko-8b-instruct",
-            "trust_remote_code": False,
-            "description": "Korean Llama 3 8B (대체 모델, snuh/hari 없을 경우)"
-        }
-    ]
-    
+    parser.add_argument(
+        "--model",
+        type=str,
+        help="Model ID to download (e.g., gemma-2-2b). If not specified, downloads all models."
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=None,
+        help="Base directory to save models (default: script directory)"
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List available models and exit"
+    )
+    parser.add_argument(
+        "--device",
+        type=str,
+        default="auto",
+        choices=["auto", "cpu", "cuda"],
+        help="Device to load model on (default: auto)"
+    )
+
+    args = parser.parse_args()
+
+    # List models and exit
+    if args.list:
+        list_available_models()
+        return
+
+    # Determine base directory
+    base_dir = Path(args.output_dir) if args.output_dir else Path(__file__).parent
+
+    # Get models to download
+    if args.model:
+        # Download specific model
+        config = get_model_config(args.model)
+        if not config:
+            print(f"Error: Model '{args.model}' not found.")
+            print("\nAvailable models:")
+            for cfg in MODEL_CONFIGS:
+                print(f"  - {cfg['id']}")
+            sys.exit(1)
+        
+        models_to_download = [config]
+    else:
+        # Download all models
+        models_to_download = MODEL_CONFIGS
+
+    # Display download plan
     print("="*60)
-    print("sLLM 모델 다운로드")
+    print("HuggingFace Model Download")
     print("="*60)
-    print("\n다운로드할 모델:")
-    for i, m in enumerate(models, 1):
-        print(f"  {i}. {m['name']}")
-        print(f"     → {m['description']}")
-    
+    print(f"\nBase directory: {base_dir.absolute()}")
+    print(f"\nModels to download ({len(models_to_download)}):")
+    for i, model_info in enumerate(models_to_download, 1):
+        print(f"  {i}. {model_info['name']} ({model_info['id']})")
+        print(f"     → {model_info['description']}")
+
+    # Download models
     results = {}
-    
-    for model_info in models:
+    for model_info in models_to_download:
+        output_dir = base_dir / model_info["id"]
         success = download_model(
             model_name=model_info["name"],
-            output_dir=str(model_info["output_dir"]),
-            trust_remote_code=model_info["trust_remote_code"]
+            output_dir=str(output_dir),
+            trust_remote_code=model_info["trust_remote_code"],
+            device=args.device
         )
         results[model_info["name"]] = success
-    
-    # 결과 출력
+
+    # Display results
     print("\n" + "="*60)
-    print("다운로드 결과")
+    print("Download Results")
     print("="*60)
+    all_success = True
     for name, success in results.items():
-        status = "✓ 성공" if success else "✗ 실패"
+        status = "✓ Success" if success else "✗ Failed"
         print(f"  {name}: {status}")
-    
-    # 디렉토리 내용 출력
-    print("\n" + "="*60)
-    print("다운로드된 모델 디렉토리")
-    print("="*60)
-    for d in base_dir.iterdir():
-        if d.is_dir() and d.name != "__pycache__":
-            size = sum(f.stat().st_size for f in d.rglob("*") if f.is_file())
-            print(f"  {d.name}: {size / (1024**3):.2f} GB")
+        if not success:
+            all_success = False
+
+    # List downloaded models
+    list_downloaded_models(base_dir)
+
+    # Exit with appropriate code
+    sys.exit(0 if all_success else 1)
 
 
 if __name__ == "__main__":
     main()
-

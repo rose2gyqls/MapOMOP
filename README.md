@@ -140,7 +140,7 @@ MAPOMOP_PORT=8080
 SCORING_MODE=local_llm  # or semantic_only
 
 # LLM 모델
-LOCAL_LLM_MODEL=qwen  # qwen, tinyllama, hari
+LOCAL_LLM_MODEL=qwen  # gemma, hari, qwen
 ```
 
 ## 서비스 관리

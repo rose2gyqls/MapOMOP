@@ -59,8 +59,8 @@ class Config:
     # SapBERT API settings
     SAPBERT_URL: str = os.getenv("SAPBERT_URL", "http://sapbert:8000")
     
-    # Local LLM settings (로컬 sLLM 사용)
-    LOCAL_LLM_MODEL: str = os.getenv("LOCAL_LLM_MODEL", "qwen")  # qwen, tinyllama, hari
+    # Local LLM settings (local sLLM usage)
+    LOCAL_LLM_MODEL: str = os.getenv("LOCAL_LLM_MODEL", "qwen")  # gemma, hari, qwen
     LOCAL_LLM_PATH: str = os.getenv("LOCAL_LLM_PATH", "/app/llm-models")
     
     # Server settings

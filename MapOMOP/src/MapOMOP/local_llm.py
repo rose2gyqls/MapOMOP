@@ -1,10 +1,10 @@
 """
 Local sLLM Module
 
-로컬에서 sLLM(Small Language Model)을 로드하고 사용하는 모듈입니다.
-지원 모델: Qwen, TinyLlama, Hari 등
+Module for loading and using Small Language Models (sLLM) locally.
+Supported models: Gemma, Hari, Qwen
 
-병원 내부망 (오프라인 환경)에서 사용 가능합니다.
+Can be used in offline environments (e.g., hospital internal networks).
 """
 
 import json
@@ -25,23 +25,23 @@ except ImportError:
 
 
 class LocalLLM:
-    """로컬 sLLM 추론 클래스"""
+    """Local sLLM inference class"""
     
-    # 지원 모델 목록
+    # Supported models list
     SUPPORTED_MODELS = {
-        "qwen": {
-            "name": "Qwen/Qwen2.5-0.5B-Instruct",
-            "local_path": "qwen2.5-0.5b-instruct",
-            "trust_remote_code": True
-        },
-        "tinyllama": {
-            "name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
-            "local_path": "tinyllama-1.1b-chat",
+        "gemma": {
+            "name": "google/gemma-2-2b",
+            "local_path": "gemma-2-2b",
             "trust_remote_code": False
         },
         "hari": {
             "name": "snuh/hari-q3-8b",
             "local_path": "hari-q3-8b",
+            "trust_remote_code": True
+        },
+        "qwen": {
+            "name": "Qwen/Qwen2.5-3B",
+            "local_path": "qwen2.5-3b",
             "trust_remote_code": True
         }
     }
@@ -59,12 +59,12 @@ class LocalLLM:
         Initialize local LLM.
         
         Args:
-            model_name: 모델 이름 (qwen, tinyllama, hari) 또는 HuggingFace 모델명
-            model_path: 로컬 모델 경로 (지정 시 우선 사용)
-            device: 디바이스 (auto, cuda, cpu)
-            max_new_tokens: 생성할 최대 토큰 수
-            temperature: 샘플링 온도
-            trust_remote_code: 원격 코드 신뢰 여부
+            model_name: Model name (gemma, hari, qwen) or HuggingFace model identifier
+            model_path: Local model path (takes precedence if specified)
+            device: Device (auto, cuda, cpu)
+            max_new_tokens: Maximum number of tokens to generate
+            temperature: Sampling temperature
+            trust_remote_code: Whether to trust remote code
         """
         if not HAS_TRANSFORMERS:
             raise RuntimeError("transformers library not installed")
@@ -93,15 +93,15 @@ class LocalLLM:
         logger.info(f"Device: {self.device}")
     
     def _resolve_model_path(self, model_name: str, model_path: Optional[str]) -> str:
-        """모델 경로 결정"""
-        # 직접 경로가 지정된 경우
+        """Resolve model path from model name or provided path."""
+        # If direct path is specified, use it
         if model_path and os.path.exists(model_path):
             return model_path
         
-        # 환경변수에서 기본 경로 확인
-        base_path = os.getenv("LLM_MODELS_PATH", "/app/models")
+        # Get base path from environment variable (LOCAL_LLM_PATH or fallback)
+        base_path = os.getenv("LOCAL_LLM_PATH") or os.getenv("LLM_MODELS_PATH", "/app/llm-models")
         
-        # 지원 모델 목록에서 찾기
+        # Find in supported models list
         if model_name.lower() in self.SUPPORTED_MODELS:
             model_info = self.SUPPORTED_MODELS[model_name.lower()]
             local_path = os.path.join(base_path, model_info["local_path"])
@@ -109,14 +109,14 @@ class LocalLLM:
             if os.path.exists(local_path):
                 return local_path
             
-            # 로컬에 없으면 HuggingFace 모델명 반환
+            # If local path doesn't exist, return HuggingFace model name
             return model_info["name"]
         
-        # 직접 HuggingFace 모델명으로 간주
+        # Treat as direct HuggingFace model name
         return model_name
     
     def load(self):
-        """모델 로드"""
+        """Load the model."""
         if self._loaded:
             return
         
@@ -171,16 +171,16 @@ class LocalLLM:
         temperature: Optional[float] = None
     ) -> str:
         """
-        텍스트 생성
+        Generate text.
         
         Args:
-            prompt: 사용자 프롬프트
-            system_prompt: 시스템 프롬프트
-            max_new_tokens: 최대 토큰 수
-            temperature: 샘플링 온도
+            prompt: User prompt
+            system_prompt: System prompt
+            max_new_tokens: Maximum number of tokens
+            temperature: Sampling temperature
             
         Returns:
-            생성된 텍스트
+            Generated text
         """
         if not self._loaded:
             self.load()
@@ -232,14 +232,14 @@ class LocalLLM:
         system_prompt: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
         """
-        JSON 형식으로 텍스트 생성
+        Generate text in JSON format.
         
         Args:
-            prompt: 프롬프트 (JSON 출력 지시 포함 권장)
-            system_prompt: 시스템 프롬프트
+            prompt: Prompt (should include JSON output instruction)
+            system_prompt: System prompt
             
         Returns:
-            파싱된 JSON 딕셔너리 또는 None
+            Parsed JSON dictionary or None
         """
         response = self.generate(prompt, system_prompt)
         
@@ -268,7 +268,7 @@ class LocalLLM:
             return None
     
     def cleanup(self):
-        """리소스 해제"""
+        """Clean up resources."""
         if self.model is not None:
             del self.model
             self.model = None
@@ -287,11 +287,11 @@ class LocalLLM:
     
     @property
     def is_loaded(self) -> bool:
-        """모델 로드 여부"""
+        """Check if model is loaded."""
         return self._loaded
     
     def __del__(self):
-        """소멸자"""
+        """Destructor."""
         self.cleanup()
 
 
@@ -305,15 +305,15 @@ def get_local_llm(
     **kwargs
 ) -> LocalLLM:
     """
-    전역 LocalLLM 인스턴스 반환 (싱글톤)
+    Get global LocalLLM instance (singleton).
     
     Args:
-        model_name: 모델 이름
-        model_path: 로컬 모델 경로
-        **kwargs: LocalLLM 추가 인자
+        model_name: Model name
+        model_path: Local model path
+        **kwargs: Additional LocalLLM arguments
         
     Returns:
-        LocalLLM 인스턴스
+        LocalLLM instance
     """
     global _global_llm
     
@@ -324,7 +324,7 @@ def get_local_llm(
 
 
 def cleanup_global_llm():
-    """전역 LLM 인스턴스 정리"""
+    """Clean up global LLM instance."""
     global _global_llm
     
     if _global_llm is not None:
