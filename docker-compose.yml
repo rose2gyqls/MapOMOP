@@ -166,6 +166,20 @@ services:
       start_period: 60s
     networks:
       - mapomop-network
+  volume_maker:
+    build:
+      context: ./volumes
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    image: mapomop/volume-maker:latest
+    platform: linux/amd64
+    container_name: mapomop-volume-maker
+    restart: unless-stopped
+    volumes:
+      - ./volumes/llm-weights:/app/volumes
+    networks:
+      - mapomop-network
 
 # ============================================================================
 # Volumes
