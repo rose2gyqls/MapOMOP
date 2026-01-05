@@ -116,7 +116,7 @@ def download_model(
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             trust_remote_code=trust_remote_code,
-            torch_dtype="auto",
+            dtype="auto",
             low_cpu_mem_usage=True,
             device_map=device
         )

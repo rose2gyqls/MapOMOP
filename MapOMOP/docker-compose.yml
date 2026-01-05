@@ -8,6 +8,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    platform: linux/amd64
     container_name: mapomop-api
     restart: unless-stopped
     ports:
@@ -26,7 +29,7 @@ services:
       - ./logs:/app/logs
       # 로컬 sLLM 모델 마운트
       - ../volumes/llm-weights:/app/llm-models:ro
-    # GPU support (uncomment if using GPU for local SapBERT)
+    # GPU support for CUDA
     deploy:
       resources:
         reservations:
@@ -45,45 +48,10 @@ services:
     depends_on:
       - elasticsearch
 
-  # CPU-only version (alternative)
-  mapomop-cpu:
-    build:
-      context: .
-      dockerfile: Dockerfile.cpu
-    container_name: mapomop-api-cpu
-    restart: unless-stopped
-    ports:
-      - "8080:8080"
-    environment:
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      - ES_USERNAME=elastic
-      - ES_PASSWORD=snomed
-      - SAPBERT_URL=http://sapbert:8000
-      - LOCAL_LLM_MODEL=qwen
-      - LOCAL_LLM_PATH=/app/llm-models
-      - SCORING_MODE=local_llm
-      - CONFIDENCE_THRESHOLD=0.5
-    volumes:
-      - ./logs:/app/logs
-      # 로컬 sLLM 모델 마운트
-      - ../volumes/llm-weights:/app/llm-models:ro
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    networks:
-      - mapomop-network
-    depends_on:
-      - elasticsearch
-    profiles:
-      - cpu-only
-
   # Elasticsearch (for standalone testing)
   elasticsearch:
     image: elasticsearch:8.18.0
+    platform: linux/amd64
     container_name: elasticsearch
     environment:
       - node.name=elasticsearch
@@ -115,4 +83,3 @@ volumes:
 networks:
   mapomop-network:
     driver: bridge
-

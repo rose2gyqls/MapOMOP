@@ -7,13 +7,13 @@
 #   - mapomop: 매핑 API 서버
 #
 # 사용법:
-#   # 전체 서비스 시작 (GPU)
+#   # 이미지 빌드 (Mac에서 linux/amd64용 빌드)
+#   docker compose build
+#
+#   # 전체 서비스 시작 (GPU 서버에서)
 #   docker compose up -d
 #
-#   # CPU 전용
-#   docker compose --profile cpu-only up -d
-#
-#   # 개발 모드
+#   # 개발 모드 (Kibana 포함)
 #   docker compose --profile dev up -d
 
 version: '3.8'
@@ -24,6 +24,7 @@ services:
   # ============================================================================
   elasticsearch:
     image: elasticsearch:8.18.0
+    platform: linux/amd64
     container_name: mapomop-elasticsearch
     restart: unless-stopped
     environment:
@@ -61,6 +62,7 @@ services:
   # ============================================================================
   kibana:
     image: kibana:8.18.0
+    platform: linux/amd64
     container_name: mapomop-kibana
     restart: unless-stopped
     environment:
@@ -85,7 +87,10 @@ services:
     build:
       context: ./sapbert-api
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
     image: mapomop/sapbert-api:latest
+    platform: linux/amd64
     container_name: mapomop-sapbert
     restart: unless-stopped
     environment:
@@ -114,43 +119,16 @@ services:
       - mapomop-network
 
   # ============================================================================
-  # SapBERT API - CPU 버전
-  # ============================================================================
-  sapbert-cpu:
-    build:
-      context: ./sapbert-api
-      dockerfile: Dockerfile.cpu
-    image: mapomop/sapbert-api:cpu
-    container_name: mapomop-sapbert-cpu
-    restart: unless-stopped
-    environment:
-      - SAPBERT_MODEL_PATH=/app/models
-      - SAPBERT_MAX_LENGTH=${SAPBERT_MAX_LENGTH:-25}
-      - SAPBERT_BATCH_SIZE=${SAPBERT_BATCH_SIZE:-32}
-      - SAPBERT_DEVICE=cpu
-    volumes:
-      - ./volumes/sapbert_models:/app/models:ro
-    ports:
-      - "${SAPBERT_PORT:-8000}:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 120s
-    networks:
-      - mapomop-network
-    profiles:
-      - cpu-only
-
-  # ============================================================================
   # MapOMOP API - 매핑 서버 (GPU)
   # ============================================================================
   mapomop:
     build:
       context: ./MapOMOP
       dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
     image: mapomop/mapomop-api:latest
+    platform: linux/amd64
     container_name: mapomop-api
     restart: unless-stopped
     environment:
@@ -189,47 +167,6 @@ services:
     networks:
       - mapomop-network
 
-  # ============================================================================
-  # MapOMOP API - CPU 버전
-  # ============================================================================
-  mapomop-cpu:
-    build:
-      context: ./MapOMOP
-      dockerfile: Dockerfile.cpu
-    image: mapomop/mapomop-api:cpu
-    container_name: mapomop-api-cpu
-    restart: unless-stopped
-    environment:
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      - ES_USERNAME=${ES_USERNAME:-elastic}
-      - ES_PASSWORD=${ES_PASSWORD:-snomed}
-      - SAPBERT_URL=http://sapbert-cpu:8000
-      - LOCAL_LLM_MODEL=${LOCAL_LLM_MODEL:-qwen}
-      - LOCAL_LLM_PATH=/app/llm-models
-      - SCORING_MODE=${SCORING_MODE:-local_llm}
-      - CONFIDENCE_THRESHOLD=${CONFIDENCE_THRESHOLD:-0.5}
-    volumes:
-      - ./volumes/llm-weights:/app/llm-models:ro
-      - mapomop-logs:/app/logs
-    ports:
-      - "${MAPOMOP_PORT:-8080}:8080"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      sapbert-cpu:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    networks:
-      - mapomop-network
-    profiles:
-      - cpu-only
-
 # ============================================================================
 # Volumes
 # ============================================================================
@@ -248,4 +185,3 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/16
-
