@@ -6,7 +6,7 @@
 # 병원 내부망(오프라인 환경)에 배포할 때 사용합니다.
 #
 # 사용법:
-#   ./scripts/save_images.sh [--cpu-only] [--output-dir ./dist]
+#   ./scripts/save_images.sh [--output-dir ./dist]
 # =============================================================================
 
 set -e
@@ -23,17 +23,21 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # 옵션 파싱
-CPU_ONLY=false
-
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --cpu-only)
-            CPU_ONLY=true
-            shift
-            ;;
         --output-dir)
             OUTPUT_DIR="$2"
             shift 2
+            ;;
+        --help)
+            echo "MapOMOP Docker 이미지 저장 스크립트"
+            echo ""
+            echo "사용법: ./scripts/save_images.sh [옵션]"
+            echo ""
+            echo "옵션:"
+            echo "  --output-dir DIR  출력 디렉토리 지정 (기본값: ./dist)"
+            echo "  --help            도움말 표시"
+            exit 0
             ;;
         *)
             echo "Unknown option: $1"
@@ -54,41 +58,18 @@ mkdir -p "$OUTPUT_DIR"
 
 cd "$PROJECT_DIR"
 
-if [ "$CPU_ONLY" = true ]; then
-    # CPU 전용 이미지만 저장
-    echo -e "${YELLOW}[1/3] SapBERT CPU 이미지 저장 중...${NC}"
-    docker save mapomop/sapbert-api:cpu | gzip > "$OUTPUT_DIR/sapbert-api-cpu.tar.gz"
-    echo -e "${GREEN}✓ sapbert-api-cpu.tar.gz 저장 완료${NC}"
+# 모든 이미지 저장 (GPU 버전만)
+echo -e "${YELLOW}[1/3] SapBERT 이미지 저장 중...${NC}"
+docker save mapomop/sapbert-api:latest | gzip > "$OUTPUT_DIR/sapbert-api.tar.gz"
+echo -e "${GREEN}✓ sapbert-api.tar.gz 저장 완료${NC}"
 
-    echo -e "\n${YELLOW}[2/3] MapOMOP CPU 이미지 저장 중...${NC}"
-    docker save mapomop/mapomop-api:cpu | gzip > "$OUTPUT_DIR/mapomop-api-cpu.tar.gz"
-    echo -e "${GREEN}✓ mapomop-api-cpu.tar.gz 저장 완료${NC}"
+echo -e "\n${YELLOW}[2/3] MapOMOP 이미지 저장 중...${NC}"
+docker save mapomop/mapomop-api:latest | gzip > "$OUTPUT_DIR/mapomop-api.tar.gz"
+echo -e "${GREEN}✓ mapomop-api.tar.gz 저장 완료${NC}"
 
-    echo -e "\n${YELLOW}[3/3] Elasticsearch 이미지 저장 중...${NC}"
-    docker save elasticsearch:8.18.0 | gzip > "$OUTPUT_DIR/elasticsearch.tar.gz"
-    echo -e "${GREEN}✓ elasticsearch.tar.gz 저장 완료${NC}"
-else
-    # 모든 이미지 저장
-    echo -e "${YELLOW}[1/5] SapBERT GPU 이미지 저장 중...${NC}"
-    docker save mapomop/sapbert-api:latest | gzip > "$OUTPUT_DIR/sapbert-api-gpu.tar.gz"
-    echo -e "${GREEN}✓ sapbert-api-gpu.tar.gz 저장 완료${NC}"
-
-    echo -e "\n${YELLOW}[2/5] SapBERT CPU 이미지 저장 중...${NC}"
-    docker save mapomop/sapbert-api:cpu | gzip > "$OUTPUT_DIR/sapbert-api-cpu.tar.gz"
-    echo -e "${GREEN}✓ sapbert-api-cpu.tar.gz 저장 완료${NC}"
-
-    echo -e "\n${YELLOW}[3/5] MapOMOP GPU 이미지 저장 중...${NC}"
-    docker save mapomop/mapomop-api:latest | gzip > "$OUTPUT_DIR/mapomop-api-gpu.tar.gz"
-    echo -e "${GREEN}✓ mapomop-api-gpu.tar.gz 저장 완료${NC}"
-
-    echo -e "\n${YELLOW}[4/5] MapOMOP CPU 이미지 저장 중...${NC}"
-    docker save mapomop/mapomop-api:cpu | gzip > "$OUTPUT_DIR/mapomop-api-cpu.tar.gz"
-    echo -e "${GREEN}✓ mapomop-api-cpu.tar.gz 저장 완료${NC}"
-
-    echo -e "\n${YELLOW}[5/5] Elasticsearch 이미지 저장 중...${NC}"
-    docker save elasticsearch:8.18.0 | gzip > "$OUTPUT_DIR/elasticsearch.tar.gz"
-    echo -e "${GREEN}✓ elasticsearch.tar.gz 저장 완료${NC}"
-fi
+echo -e "\n${YELLOW}[3/3] Elasticsearch 이미지 저장 중...${NC}"
+docker save elasticsearch:8.18.0 | gzip > "$OUTPUT_DIR/elasticsearch.tar.gz"
+echo -e "${GREEN}✓ elasticsearch.tar.gz 저장 완료${NC}"
 
 # 결과 출력
 echo -e "\n${GREEN}========================================${NC}"
@@ -104,4 +85,3 @@ echo "다음 단계:"
 echo "  1. dist/ 폴더와 volumes/ 폴더를 병원 서버로 복사"
 echo "  2. 병원 서버에서: ./scripts/load_images.sh"
 echo "  3. 서비스 시작: docker compose up -d"
-

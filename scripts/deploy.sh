@@ -5,7 +5,7 @@
 # 병원 서버에서 MapOMOP 시스템을 배포합니다.
 #
 # 사용법:
-#   ./scripts/deploy.sh [--cpu-only] [--rebuild]
+#   ./scripts/deploy.sh [--rebuild]
 # =============================================================================
 
 set -e
@@ -21,15 +21,10 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # 옵션 파싱
-CPU_ONLY=false
 REBUILD=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --cpu-only)
-            CPU_ONLY=true
-            shift
-            ;;
         --rebuild)
             REBUILD=true
             shift
@@ -40,7 +35,6 @@ while [[ $# -gt 0 ]]; do
             echo "사용법: ./scripts/deploy.sh [옵션]"
             echo ""
             echo "옵션:"
-            echo "  --cpu-only    CPU 전용 서비스로 배포"
             echo "  --rebuild     이미지 재빌드 후 배포"
             echo "  --help        도움말 표시"
             exit 0
@@ -91,22 +85,13 @@ echo -e "${GREEN}✓ 기존 서비스 중지 완료${NC}"
 # 이미지 재빌드 (요청 시)
 if [ "$REBUILD" = true ]; then
     echo -e "\n${YELLOW}이미지 재빌드 중...${NC}"
-    if [ "$CPU_ONLY" = true ]; then
-        "$SCRIPT_DIR/build_images.sh" --cpu-only
-    else
-        "$SCRIPT_DIR/build_images.sh"
-    fi
+    "$SCRIPT_DIR/build_images.sh"
 fi
 
 # 서비스 시작
 echo -e "\n${YELLOW}서비스 시작 중...${NC}"
-if [ "$CPU_ONLY" = true ]; then
-    docker compose --profile cpu-only up -d
-    echo -e "${GREEN}✓ CPU 전용 서비스 시작됨${NC}"
-else
-    docker compose up -d
-    echo -e "${GREEN}✓ GPU 서비스 시작됨${NC}"
-fi
+docker compose up -d
+echo -e "${GREEN}✓ 서비스 시작됨${NC}"
 
 # 서비스 상태 확인
 echo -e "\n${YELLOW}서비스 상태 확인 중...${NC}"
@@ -149,4 +134,3 @@ echo "유용한 명령어:"
 echo "  로그 확인: docker compose logs -f"
 echo "  서비스 중지: docker compose down"
 echo "  서비스 재시작: docker compose restart"
-

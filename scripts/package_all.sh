@@ -4,9 +4,10 @@
 # =============================================================================
 # Docker 이미지, 모델 파일, 설정 파일을 하나의 tar 파일로 패키징합니다.
 # 병원 내부망 배포용 완전한 패키지를 생성합니다.
+# Mac에서 linux/amd64 플랫폼으로 GPU 이미지를 빌드합니다.
 #
 # 사용법:
-#   ./scripts/package_all.sh [--cpu-only] [--output mapomop-package.tar.gz]
+#   ./scripts/package_all.sh [--output mapomop-package.tar.gz] [--no-models]
 # =============================================================================
 
 set -e
@@ -24,15 +25,10 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # 옵션 파싱
-CPU_ONLY=false
 INCLUDE_MODELS=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --cpu-only)
-            CPU_ONLY=true
-            shift
-            ;;
         --output)
             OUTPUT_FILE="$2"
             shift 2
@@ -47,7 +43,6 @@ while [[ $# -gt 0 ]]; do
             echo "사용법: ./scripts/package_all.sh [옵션]"
             echo ""
             echo "옵션:"
-            echo "  --cpu-only    CPU 전용 이미지만 포함"
             echo "  --no-models   모델 파일 제외"
             echo "  --output FILE 출력 파일명 지정"
             echo "  --help        도움말 표시"
@@ -64,6 +59,7 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}MapOMOP 전체 패키지 생성${NC}"
 echo -e "${BLUE}========================================${NC}"
 echo ""
+echo "플랫폼: linux/amd64"
 echo "출력 파일: $OUTPUT_FILE"
 echo "임시 디렉토리: $TEMP_DIR"
 echo ""
@@ -85,23 +81,13 @@ mkdir -p "$TEMP_DIR/mapomop/scripts"
 
 # 1. Docker 이미지 빌드
 echo -e "${YELLOW}[1/5] Docker 이미지 빌드 중...${NC}"
-if [ "$CPU_ONLY" = true ]; then
-    "$SCRIPT_DIR/build_images.sh" --cpu-only
-else
-    "$SCRIPT_DIR/build_images.sh"
-fi
+"$SCRIPT_DIR/build_images.sh"
 echo -e "${GREEN}✓ 이미지 빌드 완료${NC}"
 
 # 2. Docker 이미지 저장
 echo -e "\n${YELLOW}[2/5] Docker 이미지 저장 중...${NC}"
-
-if [ "$CPU_ONLY" = true ]; then
-    docker save mapomop/sapbert-api:cpu | gzip > "$TEMP_DIR/mapomop/images/sapbert-api-cpu.tar.gz"
-    docker save mapomop/mapomop-api:cpu | gzip > "$TEMP_DIR/mapomop/images/mapomop-api-cpu.tar.gz"
-else
-    docker save mapomop/sapbert-api:latest mapomop/sapbert-api:cpu | gzip > "$TEMP_DIR/mapomop/images/sapbert-api.tar.gz"
-    docker save mapomop/mapomop-api:latest mapomop/mapomop-api:cpu | gzip > "$TEMP_DIR/mapomop/images/mapomop-api.tar.gz"
-fi
+docker save mapomop/sapbert-api:latest | gzip > "$TEMP_DIR/mapomop/images/sapbert-api.tar.gz"
+docker save mapomop/mapomop-api:latest | gzip > "$TEMP_DIR/mapomop/images/mapomop-api.tar.gz"
 docker save elasticsearch:8.18.0 | gzip > "$TEMP_DIR/mapomop/images/elasticsearch.tar.gz"
 echo -e "${GREEN}✓ 이미지 저장 완료${NC}"
 
@@ -146,7 +132,7 @@ cat > "$TEMP_DIR/mapomop/INSTALL.md" << 'EOF'
 ## 사전 요구사항
 - Docker 20.10 이상
 - Docker Compose 2.0 이상
-- (GPU 사용 시) NVIDIA Docker
+- NVIDIA Docker (GPU 사용)
 
 ## 설치 단계
 
@@ -164,15 +150,8 @@ vi .env
 ```
 
 ### 3. 서비스 시작
-
-#### GPU 버전
 ```bash
 docker compose up -d
-```
-
-#### CPU 버전
-```bash
-docker compose --profile cpu-only up -d
 ```
 
 ### 4. 상태 확인
@@ -220,4 +199,3 @@ echo "  1. $OUTPUT_FILE 파일을 병원 서버로 복사"
 echo "  2. tar -xzf $OUTPUT_FILE"
 echo "  3. cd mapomop && ./scripts/load_images.sh"
 echo "  4. docker compose up -d"
-
