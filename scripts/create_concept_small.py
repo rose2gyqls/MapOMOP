@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Concept-Small CSV generation script
+CONCEPT_SMALL CSV generation script
 
-Combines the CONCEPT table and the CONCEPT_SYNONYM table (language_concept_id=4180186)
-to generate the concept-small.csv file.
+Combines the CONCEPT table (name_type='Original') and English rows of the
+CONCEPT_SYNONYM table (language_concept_id=4180186, name_type='Synonym')
+into CONCEPT_SMALL.csv, the source of the concept-small search index.
 
 Usage:
-    python scripts/prepare_concept_small.py --data-folder /path/to/omop-cdm
-    python scripts/prepare_concept_small.py  # use default path
+    python scripts/create_concept_small.py --data-folder /path/to/omop-cdm
+    python scripts/create_concept_small.py  # use default path
 """
 
 import argparse

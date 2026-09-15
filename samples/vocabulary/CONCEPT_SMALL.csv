@@ -1,0 +1,21 @@
+concept_id	concept_name	name_type	domain_id	vocabulary_id	concept_class_id	standard_concept	concept_code	valid_start_date	valid_end_date	invalid_reason
+4186397	Myocardial ischemia	Original	Condition	SNOMED	Disorder	S	414795007	20050131	20991231	
+40436953	Myocardial ischemia	Original	Condition	SNOMED	Disorder		233822007	20020131	20020131	D
+201826	Type 2 diabetes mellitus	Original	Condition	SNOMED	Disorder	S	44054006	20020131	20991231	
+1567956	Type 2 diabetes mellitus	Original	Condition	ICD10CM	3-char nonbill code		E11	20120101	20991231	
+320128	Essential hypertension	Original	Condition	SNOMED	Disorder	S	59621000	20020131	20991231	
+44833556	Essential hypertension	Original	Condition	ICD9CM	3-dig nonbill code		401	19700101	20991231	
+4198190	Appendectomy	Original	Procedure	SNOMED	Procedure	S	80146002	20020131	20991231	
+2002907	Appendectomy	Original	Procedure	ICD9Proc	3-dig nonbill code		47.0	19700101	20991231	
+3004501	Glucose [Mass/volume] in Serum or Plasma	Original	Measurement	LOINC	Lab Test	S	2345-7	19700101	20991231	
+441818	Hemangioma	Original	Condition	SNOMED	Disorder	S	400210000	20030731	20991231	
+40436953	Myocardial ischaemia	Synonym	Condition	SNOMED	Disorder		233822007	20020131	20020131	D
+4186397	Cardiac ischemia	Synonym	Condition	SNOMED	Disorder	S	414795007	20050131	20991231	
+201826	Type II diabetes mellitus	Synonym	Condition	SNOMED	Disorder	S	44054006	20020131	20991231	
+201826	Diabetes mellitus type 2	Synonym	Condition	SNOMED	Disorder	S	44054006	20020131	20991231	
+320128	Primary hypertension	Synonym	Condition	SNOMED	Disorder	S	59621000	20020131	20991231	
+320128	Idiopathic hypertension	Synonym	Condition	SNOMED	Disorder	S	59621000	20020131	20991231	
+441818	Haemangioma	Synonym	Condition	SNOMED	Disorder	S	400210000	20030731	20991231	
+4198190	Appendicectomy	Synonym	Procedure	SNOMED	Procedure	S	80146002	20020131	20991231	
+4198190	Excision of appendix	Synonym	Procedure	SNOMED	Procedure	S	80146002	20020131	20991231	
+3004501	Glucose SerPl-mCnc	Synonym	Measurement	LOINC	Lab Test	S	2345-7	19700101	20991231	

@@ -1,8 +1,8 @@
 """
 Elasticsearch Indexer Module
 
-Provides functionality to index OMOP CDM data into Elasticsearch.
-Supports CONCEPT, CONCEPT_RELATIONSHIP, and CONCEPT_SYNONYM tables.
+Provides functionality to index OMOP vocabulary tables into Elasticsearch.
+Supports CONCEPT, CONCEPT_SMALL, CONCEPT_RELATIONSHIP, and CONCEPT_SYNONYM tables.
 
 Robust indexing:
     - 429 Too Many Requests -> exponential backoff retry (5-300s, up to 7 times)
@@ -653,7 +653,3 @@ class ElasticsearchIndexer:
         except Exception as e:
             self.logger.error(f"Failed to delete index: {e}")
             return False
-
-
-# Backward compatibility alias
-ConceptElasticsearchIndexer = ElasticsearchIndexer

@@ -1,5 +1,5 @@
 """
-Common utility functions for OMOP Mapper.
+Common utility functions for MapOMOP.
 """
 
 import math
@@ -81,10 +81,6 @@ def reduce_embedding_dim(
         return reduced.flatten()
     return reduced
 
-
-# =============================================================================
-# Score normalization
-# =============================================================================
 
 # =============================================================================
 # Candidate deduplication

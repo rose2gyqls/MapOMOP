@@ -1,8 +1,8 @@
 """
 Elasticsearch Client Module
 
-Provides connection and search functionality for OMOP CDM indices.
-Supports concept, concept-relationship, and concept-synonym indices.
+Provides connection and search functionality for the OMOP vocabulary indices:
+concept-small, concept-relationship, and concept-synonym.
 """
 
 import logging

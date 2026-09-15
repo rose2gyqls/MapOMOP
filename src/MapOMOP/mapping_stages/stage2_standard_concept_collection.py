@@ -1,7 +1,8 @@
 """
 Stage 2: Standard Concept Collection
 
-Converts concepts using relationship transformations and "Maps to" relationships.
+Collects OMOP Standard Concepts (standard_concept = 'S' or 'C') from Stage 1
+candidates by following CONCEPT_RELATIONSHIP links and "Maps to".
 Process (2 rounds of [relation transform → Maps to]):
 1. Round 1: Stage 1 candidates → transform via TRANSFORM_RELATIONSHIP_IDS
    → for both transformed and untransformed candidates, apply Maps to if non-std
@@ -12,14 +13,14 @@ Process (2 rounds of [relation transform → Maps to]):
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from ..utils import deduplicate_by_concept
 
 logger = logging.getLogger(__name__)
 
 
-class Stage2StandardCollection:
+class Stage2StandardConceptCollection:
     """Stage 2: Convert to standard concepts via relationship transformations."""
     
     # Relationship IDs for transformation
@@ -167,7 +168,6 @@ class Stage2StandardCollection:
             # 2) Relationship transform
             related_concepts = self._get_related_concepts_with_relation(concept_id)
             for related, relation_id in related_concepts:
-                related_id = str(related.get('concept_id', ''))
                 self._add_candidate_or_maps_to(
                     {'concept': related, 'original_candidate': candidate['original_candidate'],
                      'search_type': candidate['search_type']},

@@ -1,14 +1,11 @@
 """
-Stage 3: Hybrid Scoring
+Stage 3: LLM Scoring
 
-Final scoring and ranking of candidates using multiple strategies:
-- llm: LLM-based evaluation without semantic scores (default)
-- llm_with_score: LLM-based evaluation with semantic scores in prompt
-- semantic: SapBERT cosine similarity only
+Scores every Standard Concept candidate from Stage 2 against the source term
+with an LLM, following OMOP hierarchy rules (Equivalent > Parent; Child and
+meaning-changed concepts are rejected), and ranks candidates by that score.
 
-Supports multiple LLM providers via LLMClient:
-- OpenAI (gpt-5-mini-2025-08-07, etc.)
-- Together AI serverless models
+The LLM backend is provider-agnostic via LLMClient (OpenAI, Together AI).
 """
 
 import json
@@ -20,18 +17,9 @@ from ..llm_client import LLMClient, get_llm_client
 
 logger = logging.getLogger(__name__)
 
-# Optional dependencies
-try:
-    import numpy as np
-    from sklearn.metrics.pairwise import cosine_similarity
-    HAS_NUMPY = True
-except ImportError:
-    HAS_NUMPY = False
-    np = None
-
 
 # =============================================================================
-# Prompt Templates (easily customizable)
+# Prompt templates
 # =============================================================================
 
 SYSTEM_PROMPT = """You are a clinical terminology and ontology expert. You are given one entity and several candidate OMOP CDM concepts.
@@ -146,7 +134,7 @@ Entity: {entity_name}
 
 Candidates:
 {candidates_json}
-{score_hint}
+
 
 ### Output Requirements
 - Every candidate MUST receive a score.
@@ -165,247 +153,106 @@ Output Format (JSON only):
 }}
 """
 
-SCORE_HINT_TEMPLATE = """
-**Semantic Similarity Info**:
-- semantic_similarity: SapBERT embedding cosine similarity (0.0-1.0)
-  - Higher = more semantically similar
-  - Use as reference, but prioritize medical accuracy
-"""
 
+class Stage3LLMScoring:
+    """Stage 3: LLM-based scoring and ranking of Standard Concept candidates."""
 
-class ScoringMode:
-    """Available scoring modes."""
-    LLM = "llm"                    # LLM without score (default)
-    LLM_WITH_SCORE = "llm_with_score"  # LLM with semantic score
-    SEMANTIC = "semantic"          # Semantic similarity only
-
-
-class Stage3HybridScoring:
-    """Stage 3: Hybrid/LLM-based candidate scoring."""
-    
-    # Prompt templates (can be overridden)
+    # Prompt templates (can be overridden by subclasses)
     SYSTEM_PROMPT = SYSTEM_PROMPT
     USER_PROMPT_TEMPLATE = USER_PROMPT_TEMPLATE
-    SCORE_HINT_TEMPLATE = SCORE_HINT_TEMPLATE
-    
-    # Default LLM hyperparameters
-    DEFAULT_TEMPERATURE = 0.3
-    DEFAULT_TOP_P = 1.0
-    
+
     def __init__(
         self,
-        sapbert_model=None,
-        sapbert_tokenizer=None,
-        sapbert_device=None,
-        es_client=None,
         llm_client: Optional[LLMClient] = None,
         llm_provider: Optional[str] = None,
         llm_model: Optional[str] = None,
         llm_base_url: Optional[str] = None,
         llm_api_key: Optional[str] = None,
-        scoring_mode: str = ScoringMode.LLM,
-        include_non_std_info: bool = False,
         temperature: Optional[float] = None,
         top_p: Optional[float] = None,
         max_tokens: Optional[int] = None,
     ):
         """
         Initialize Stage 3.
-        
+
         Args:
-            sapbert_model: SapBERT model (for semantic mode)
-            sapbert_tokenizer: SapBERT tokenizer
-            sapbert_device: SapBERT device
-            es_client: Elasticsearch client
-            llm_client: LLM client instance (uses default if None)
-            scoring_mode: Scoring mode
-                - 'llm': LLM without score (default)
-                - 'llm_with_score': LLM with semantic score in prompt
-                - 'semantic': Semantic similarity only
-            include_non_std_info: Include original non-std concept info in LLM prompt
-            temperature: LLM temperature (0.0-2.0, default from env or 0.3)
-            top_p: LLM top_p / nucleus sampling (0.0-1.0, default from env or 1.0)
+            llm_client: Pre-configured LLM client (a new one is created if None)
+            llm_provider: LLM route key (openai, together)
+            llm_model: Optional model override
+            llm_base_url: Optional OpenAI-compatible base URL override
+            llm_api_key: Optional API key override
+            temperature: LLM temperature (default from env or 0.3)
+            top_p: LLM top_p / nucleus sampling (default from env or 1.0)
+            max_tokens: LLM max output tokens (default from env or model default)
         """
-        self.es_client = es_client
-        self.scoring_mode = scoring_mode.lower()
-        self.include_non_std_info = include_non_std_info
-        
-        # SapBERT settings (for semantic scoring)
-        self.sapbert_model = sapbert_model
-        self.sapbert_tokenizer = sapbert_tokenizer
-        self.sapbert_device = sapbert_device
-        
-        # LLM client (supports OpenAI and Together)
         self.llm_client = llm_client
-        self.llm_provider = llm_provider
-        self.llm_model = llm_model
-        self.llm_base_url = llm_base_url
-        self.llm_api_key = llm_api_key
         self.temperature = temperature
         self.top_p = top_p
-        self.max_tokens = max_tokens
-        
-        # Initialize based on mode
-        self._initialize_mode()
-    
-    def _initialize_mode(self):
-        """Initialize based on scoring mode."""
-        if self.scoring_mode in [ScoringMode.LLM, ScoringMode.LLM_WITH_SCORE]:
-            # Use provided client or get default
-            if self.llm_client is None:
-                self.llm_client = get_llm_client(
-                    provider=self.llm_provider,
-                    model=self.llm_model,
-                    base_url=self.llm_base_url,
-                    api_key=self.llm_api_key,
-                    temperature=self.temperature,
-                    top_p=self.top_p,
-                    max_tokens=self.max_tokens,
-                )
-            
-            if self.llm_client.is_initialized:
-                mode_desc = "with score" if self.scoring_mode == ScoringMode.LLM_WITH_SCORE else "without score"
-                llm_info = self.llm_client.get_info()
-                logger.info(
-                    f"Stage 3 initialized (LLM mode {mode_desc}, "
-                    f"provider: {llm_info['provider']}, model: {llm_info['model']})"
-                )
-            else:
-                logger.error("LLM client not initialized")
-        elif self.scoring_mode == ScoringMode.SEMANTIC:
-            logger.info("Stage 3 initialized (Semantic mode)")
+
+        if self.llm_client is None:
+            self.llm_client = get_llm_client(
+                provider=llm_provider,
+                model=llm_model,
+                base_url=llm_base_url,
+                api_key=llm_api_key,
+                temperature=temperature,
+                top_p=top_p,
+                max_tokens=max_tokens,
+            )
+
+        if self.llm_client.is_initialized:
+            llm_info = self.llm_client.get_info()
+            logger.info(
+                f"Stage 3 initialized (LLM scoring, "
+                f"provider: {llm_info['provider']}, model: {llm_info['model']})"
+            )
         else:
-            logger.warning(f"Unknown scoring mode: {self.scoring_mode}, defaulting to 'llm'")
-            self.scoring_mode = ScoringMode.LLM
-    
-    @property
-    def include_scores_in_prompt(self) -> bool:
-        """Whether to include semantic scores in LLM prompt."""
-        return self.scoring_mode == ScoringMode.LLM_WITH_SCORE
-    
-    def calculate_hybrid_scores(
+            logger.error("LLM client not initialized")
+
+    def score_candidates(
         self,
         entity_name: str,
         stage2_candidates: List[Dict[str, Any]],
-        stage1_candidates: Optional[List[Dict[str, Any]]] = None,
-        entity_embedding: Optional[Any] = None
     ) -> List[Dict[str, Any]]:
         """
-        Calculate final scores and rank candidates.
-        
+        Score Stage 2 candidates with the LLM and rank them.
+
         Args:
-            entity_name: Entity name
-            stage2_candidates: Candidates from Stage 2
-            stage1_candidates: Stage 1 candidates (unused, for compatibility)
-            entity_embedding: Entity SapBERT embedding
-            
+            entity_name: Source term to map
+            stage2_candidates: Standard Concept candidates from Stage 2
+
         Returns:
-            Sorted candidates with final scores
+            Candidates sorted by LLM score (descending); empty list on failure
         """
-        mode_display_names = {
-            ScoringMode.LLM: 'LLM (w/o score)',
-            ScoringMode.LLM_WITH_SCORE: 'LLM (with score)',
-            ScoringMode.SEMANTIC: 'Semantic'
-        }
-        
         if not stage2_candidates:
             logger.warning("No candidates to score")
             return []
-        
-        if self.scoring_mode in [ScoringMode.LLM, ScoringMode.LLM_WITH_SCORE]:
-            return self._score_llm(entity_name, stage2_candidates, entity_embedding)
-        elif self.scoring_mode == ScoringMode.SEMANTIC:
-            return self._score_semantic(entity_name, stage2_candidates, entity_embedding)
-        else:
-            logger.error(f"Unknown scoring mode: {self.scoring_mode}")
-            return []
-    
-    def _score_semantic(
-        self,
-        entity_name: str,
-        candidates: List[Dict[str, Any]],
-        entity_embedding: Optional[Any]
-    ) -> List[Dict[str, Any]]:
-        """Score using semantic similarity only."""
-        if entity_embedding is None:
-            logger.warning("No entity embedding for semantic scoring")
-            return []
-        
-        results = []
-        
-        for candidate in candidates:
-            concept = candidate['concept']
-            concept_emb = concept.get('concept_embedding')
-            semantic_sim = self._compute_cosine(entity_embedding, concept_emb) or 0.0
-            
-            # Elasticsearch score (sigmoid normalized)
-            es_score = candidate.get('elasticsearch_score', 0.0)
-            es_score_normalized = sigmoid_normalize(es_score, center=3.0)
-            
-            results.append({
-                'concept': concept,
-                'is_original_standard': candidate.get('is_original_standard', True),
-                'original_candidate': candidate.get('original_candidate', {}),
-                'original_non_standard': candidate.get('original_non_standard'),
-                'elasticsearch_score': es_score,
-                'elasticsearch_score_normalized': es_score_normalized,
-                'search_type': candidate.get('search_type', 'unknown'),
-                'semantic_similarity': semantic_sim,
-                'final_score': semantic_sim
-            })
-        
-        sorted_results = sorted(results, key=lambda x: x['final_score'], reverse=True)
-        
-        self._log_results("Semantic", sorted_results)
-        return sorted_results
-    
-    def _score_llm(
-        self,
-        entity_name: str,
-        candidates: List[Dict[str, Any]],
-        entity_embedding: Optional[Any]
-    ) -> List[Dict[str, Any]]:
-        """Score using LLM evaluation."""
+
         if not self.llm_client or not self.llm_client.is_initialized:
             logger.error("LLM client not initialized")
             return []
-        
-        # Prepare candidates with optional semantic scores
+
         results = []
-        for candidate in candidates:
-            concept = candidate['concept']
-            
-            # Elasticsearch score (sigmoid normalized)
+        for candidate in stage2_candidates:
             es_score = candidate.get('elasticsearch_score', 0.0)
-            es_score_normalized = sigmoid_normalize(es_score, center=3.0)
-            
-            data = {
-                'concept': concept,
+            results.append({
+                'concept': candidate['concept'],
                 'is_original_standard': candidate.get('is_original_standard', True),
                 'original_candidate': candidate.get('original_candidate', {}),
                 'original_non_standard': candidate.get('original_non_standard'),
                 'relation_type': candidate.get('relation_type', 'original'),
                 'elasticsearch_score': es_score,
-                'elasticsearch_score_normalized': es_score_normalized,
+                'elasticsearch_score_normalized': sigmoid_normalize(es_score, center=3.0),
                 'search_type': candidate.get('search_type', 'unknown')
-            }
-            
-            # Add semantic similarity if mode requires it
-            if self.include_scores_in_prompt and entity_embedding is not None:
-                concept_emb = concept.get('concept_embedding')
-                data['semantic_similarity'] = self._compute_cosine(entity_embedding, concept_emb) or 0.0
-            
-            results.append(data)
-        
-        # Get LLM scores
+            })
+
         try:
             llm_scores = self._call_llm(entity_name, results)
-            
+
             if not llm_scores:
                 logger.error("LLM scoring failed")
                 return []
-            
-            # Apply scores
+
             for candidate in results:
                 cid = str(candidate['concept'].get('concept_id', ''))
                 if cid in llm_scores:
@@ -417,148 +264,98 @@ class Stage3HybridScoring:
                     candidate['llm_score'] = 0.0
                     candidate['llm_rank'] = 999
                     candidate['final_score'] = 0.0
-            
+
             sorted_results = sorted(results, key=lambda x: x['llm_score'], reverse=True)
-            
-            self._log_results("LLM", sorted_results)
+
+            self._log_results(sorted_results)
             return sorted_results
-            
+
         except Exception as e:
             logger.error(f"LLM scoring failed: {e}")
             return []
-    
-    def _compute_cosine(self, emb1: Any, emb2: Any) -> Optional[float]:
-        """Compute cosine similarity between embeddings."""
-        if emb1 is None or emb2 is None or not HAS_NUMPY:
-            return None
-        
-        try:
-            # Convert to numpy arrays
-            if isinstance(emb2, str):
-                emb2 = np.array(json.loads(emb2))
-            elif isinstance(emb2, list):
-                emb2 = np.array(emb2)
-            
-            if isinstance(emb1, list):
-                emb1 = np.array(emb1)
-            
-            if emb1 is None or emb2 is None:
-                return None
-            
-            # Compute similarity
-            sim = cosine_similarity(emb1.reshape(1, -1), emb2.reshape(1, -1))[0][0]
-            return float((sim + 1) / 2)  # Normalize to 0-1
-            
-        except Exception as e:
-            logger.debug(f"Cosine computation failed: {e}")
-            return None
-    
+
     def _call_llm(
         self,
         entity_name: str,
         candidates: List[Dict[str, Any]]
     ) -> Optional[Dict[str, Dict[str, Any]]]:
-        """Call LLM API for scoring."""
+        """Send the scoring prompt to the LLM and parse the rankings."""
         prompt = self._build_prompt(entity_name, candidates)
-        
+
         try:
             messages = [
                 {"role": "system", "content": self.SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}
             ]
-            
+
             response = self.llm_client.chat_completion(
                 messages=messages,
                 temperature=self.temperature,
                 top_p=self.top_p,
                 json_mode=True,
-                metrics_tag="stage3_hybrid_scoring",
+                metrics_tag="stage3_llm_scoring",
             )
-            
+
             if response is None:
                 return None
-            
+
             return self._parse_llm_response(response, candidates)
-            
+
         except Exception as e:
             logger.error(f"LLM API call failed: {e}")
             return None
-    
+
     def _build_prompt(self, entity_name: str, candidates: List[Dict[str, Any]]) -> str:
-        """Build LLM prompt from template.
-        
-        Each candidate has:
-        - index, concept_id, concept_name, domain_id (always)
-        - original_concept: only when Maps-to transformed (original_non_standard exists)
-        - semantic_similarity: only when llm_with_score mode
+        """
+        Build the user prompt.
+
+        Each candidate carries index, concept_id and concept_name. Candidates
+        reached via "Maps to" also carry the original non-standard concept.
         """
         candidates_info = []
         for i, c in enumerate(candidates, 1):
             concept = c['concept']
-            concept_name = concept.get('concept_name', '')
-            
-            # If include_non_std_info is True and this is a non-std to std mapping,
-            # show as "std_concept_name (non_std_concept_name)"
-            if self.include_non_std_info and not c.get('is_original_standard', True):
-                original_non_std = c.get('original_non_standard')
-                if original_non_std:
-                    non_std_name = original_non_std.get('concept_name', '')
-                    if non_std_name and non_std_name != concept_name:
-                        concept_name = f"{concept_name} ({non_std_name})"
-            
             info = {
                 'index': i,
                 'concept_id': str(concept.get('concept_id', '')),
-                'concept_name': concept_name,
-                # 'domain_id': concept.get('domain_id', ''),
+                'concept_name': concept.get('concept_name', ''),
             }
-            
-            # Maps-to transformed only: include original concept for reference
-            if c.get('relation_type') == 'Maps to':
-                original_non_std = c.get('original_non_standard')
-                if original_non_std:
-                    info['original_concept'] = {
-                        'concept_id': str(original_non_std.get('concept_id', '')),
-                        'concept_name': original_non_std.get('concept_name', ''),
-                    }
-            
-            # Add semantic similarity if mode requires it
-            if self.include_scores_in_prompt and 'semantic_similarity' in c:
-                info['semantic_similarity'] = round(c['semantic_similarity'], 4)
-            
+
+            original_non_std = c.get('original_non_standard')
+            if c.get('relation_type') == 'Maps to' and original_non_std:
+                info['original_concept'] = {
+                    'concept_id': str(original_non_std.get('concept_id', '')),
+                    'concept_name': original_non_std.get('concept_name', ''),
+                }
+
             candidates_info.append(info)
-        
-        # Build score hint
-        score_hint = self.SCORE_HINT_TEMPLATE if self.include_scores_in_prompt else ""
-        
-        # Build final prompt from template
+
         return self.USER_PROMPT_TEMPLATE.format(
             entity_name=entity_name,
             candidates_json=json.dumps(candidates_info, ensure_ascii=False, indent=2),
-            score_hint=score_hint
         )
-    
+
     def _parse_llm_response(
         self,
         response_text: str,
         candidates: List[Dict[str, Any]]
     ) -> Dict[str, Dict[str, Any]]:
-        """Parse LLM response."""
+        """Parse the LLM JSON response into {concept_id: {score, rank, reasoning}}."""
         try:
             text = response_text.strip()
             if '```json' in text:
                 text = text.split('```json')[1].split('```')[0].strip()
             elif '```' in text:
                 text = text.split('```')[1].split('```')[0].strip()
-            
+
             parsed = json.loads(text)
             result = {}
-            
+
             rankings = parsed.get('rankings', [])
-            
+
             # Sort by score descending and assign ranks
             rankings_sorted = sorted(rankings, key=lambda x: float(x.get('score', 0)), reverse=True)
-            
+
             for rank, item in enumerate(rankings_sorted, 1):
                 cid = str(item.get('concept_id', ''))
                 if cid:
@@ -567,21 +364,21 @@ class Stage3HybridScoring:
                         'rank': rank,
                         'reasoning': item.get('reasoning', '')
                     }
-            
-            # Ensure all candidates are in result
+
+            # Candidates the LLM did not rank get the lowest score
             for c in candidates:
                 cid = str(c['concept'].get('concept_id', ''))
                 if cid not in result:
                     result[cid] = {'score': 0.0, 'rank': 999, 'reasoning': 'Not ranked'}
-            
+
             return result
-            
+
         except Exception as e:
             logger.error(f"LLM response parsing failed: {e}")
             return {}
-    
-    def _log_results(self, mode: str, results: List[Dict[str, Any]]):
-        """Log scoring results: concept_name (concept_id) score, reasoning."""
+
+    def _log_results(self, results: List[Dict[str, Any]]):
+        """Log top results as: concept_name (concept_id) score, then reasoning."""
         logger.info("Stage 3: Scoring Results")
         for r in results[:15]:
             concept = r['concept']

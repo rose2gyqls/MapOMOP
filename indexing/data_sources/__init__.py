@@ -1,18 +1,16 @@
 """
 Data Sources Module
 
-Provides data source adapters for different OMOP CDM sources:
-    - LocalCSVDataSource: Read from local CSV files
-    - PostgresDataSource: Read from PostgreSQL database
+Provides the reader for OMOP vocabulary files downloaded from Athena:
+    - VocabularyCSVDataSource: Reads CONCEPT, CONCEPT_RELATIONSHIP, CONCEPT_SYNONYM,
+      and CONCEPT_SMALL CSV files
 """
 
 from .base import BaseDataSource, DataSourceType
-from .local_csv import LocalCSVDataSource
-from .postgres import PostgresDataSource
+from .read_vocabulary import VocabularyCSVDataSource
 
 __all__ = [
     'BaseDataSource',
     'DataSourceType',
-    'LocalCSVDataSource',
-    'PostgresDataSource'
+    'VocabularyCSVDataSource',
 ]

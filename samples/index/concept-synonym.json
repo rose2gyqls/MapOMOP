@@ -1,0 +1,92 @@
+[
+  {
+    "_index": "concept-synonym",
+    "_id": "a80072543ad18e21c37110672b662cca",
+    "_source": {
+      "concept_id": "40436953",
+      "concept_synonym_name": "Myocardial ischaemia",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "b7cc20a4954cd70041a63c93a6113372",
+    "_source": {
+      "concept_id": "4186397",
+      "concept_synonym_name": "Cardiac ischemia",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "26b9135cb1de8e45fa99af858e4e06f5",
+    "_source": {
+      "concept_id": "201826",
+      "concept_synonym_name": "Type II diabetes mellitus",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "d3b15fadad4a73e158175615479ee71d",
+    "_source": {
+      "concept_id": "201826",
+      "concept_synonym_name": "Diabetes mellitus type 2",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "997dd60f4a0dcafa3b8dace4a0fd8c6c",
+    "_source": {
+      "concept_id": "320128",
+      "concept_synonym_name": "Primary hypertension",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "e2939a9e7834c56c99cee0f285b0a295",
+    "_source": {
+      "concept_id": "320128",
+      "concept_synonym_name": "Idiopathic hypertension",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "d654bb07bf39feaffd6266c6dbeee06f",
+    "_source": {
+      "concept_id": "441818",
+      "concept_synonym_name": "Haemangioma",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "48aad2bc459eef2be5f7638bd3739c17",
+    "_source": {
+      "concept_id": "4198190",
+      "concept_synonym_name": "Appendicectomy",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "6f4366407d5415fae642121d1dcc2473",
+    "_source": {
+      "concept_id": "4198190",
+      "concept_synonym_name": "Excision of appendix",
+      "language_concept_id": "4180186"
+    }
+  },
+  {
+    "_index": "concept-synonym",
+    "_id": "3f12cfcea533f3b2d48df591b5c71d27",
+    "_source": {
+      "concept_id": "3004501",
+      "concept_synonym_name": "Glucose SerPl-mCnc",
+      "language_concept_id": "4180186"
+    }
+  }
+]

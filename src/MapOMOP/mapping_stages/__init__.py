@@ -2,19 +2,17 @@
 Mapping Stages Module
 
 Provides the 3-stage mapping pipeline components:
-    - Stage1CandidateRetrieval: Multi-strategy candidate search
-    - Stage2StandardCollection: Standard concept conversion
-    - Stage3HybridScoring: Final scoring and ranking
-    - ScoringMode: Available scoring modes for Stage 3
+    - Stage1CandidateRetrieval: Lexical, semantic, and combined candidate search
+    - Stage2StandardConceptCollection: Non-standard to Standard Concept conversion
+    - Stage3LLMScoring: LLM-based final scoring and ranking
 """
 
 from .stage1_candidate_retrieval import Stage1CandidateRetrieval
-from .stage2_standard_collection import Stage2StandardCollection
-from .stage3_hybrid_scoring import Stage3HybridScoring, ScoringMode
+from .stage2_standard_concept_collection import Stage2StandardConceptCollection
+from .stage3_llm_scoring import Stage3LLMScoring
 
 __all__ = [
     "Stage1CandidateRetrieval",
-    "Stage2StandardCollection",
-    "Stage3HybridScoring",
-    "ScoringMode",
+    "Stage2StandardConceptCollection",
+    "Stage3LLMScoring",
 ]

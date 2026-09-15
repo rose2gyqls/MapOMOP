@@ -1,0 +1,11 @@
+no,domain_id,source_value,concept_id,concept_name
+1428,Condition,Corneal erosion,4179918,corneal erosion
+310,Condition,Atrial fibrillation,313217,atrial fibrillation
+303,Condition,Acute myocardial infarction,312327,acute myocardial infarction
+2311,Condition,Polycystic ovarian syndrome,40443308,polycystic ovary syndrome
+718,Drug,Lamotrigine 100mg tab,705108,lamotrigine 100 mg oral tablet
+740,Drug,Sertraline 50mg tab,739209,sertraline 50 mg oral tablet
+2804,Measurement,Systolic Blood Pressure,3004249,systolic blood pressure
+2820,Measurement,Blood Urea Nitrogen,3013682,urea nitrogen [mass/volume] in serum or plasma
+928,Procedure,Closed [endoscopic] biopsy of stomach,4004241,endoscopic biopsy of stomach
+942,Procedure,Endoscopy of nasal sinus,4010253,nasal sinus endoscopy

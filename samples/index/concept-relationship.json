@@ -1,0 +1,122 @@
+[
+  {
+    "_index": "concept-relationship",
+    "_id": "d3f3b89da929e79adca21628e8c6b4f1",
+    "_source": {
+      "concept_id_1": "1567956",
+      "concept_id_2": "201826",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "e8e3bed06ffe349ac13d27e613428e84",
+    "_source": {
+      "concept_id_1": "44833556",
+      "concept_id_2": "320128",
+      "relationship_id": "Maps to",
+      "valid_start_date": "20131127",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "6bad711c83a744bf781fc96589e5f13b",
+    "_source": {
+      "concept_id_1": "2002907",
+      "concept_id_2": "4198190",
+      "relationship_id": "Maps to",
+      "valid_start_date": "20180625",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "e595b6167b656cfd7f1d3b9369a84ff2",
+    "_source": {
+      "concept_id_1": "40436953",
+      "concept_id_2": "4186397",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "8281f4a1fc837911fca48ce2158bfd56",
+    "_source": {
+      "concept_id_1": "201826",
+      "concept_id_2": "201826",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "8cd968e0d96225e2978d3d514926479f",
+    "_source": {
+      "concept_id_1": "320128",
+      "concept_id_2": "320128",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "0abac3905025a34db2e98c5847094295",
+    "_source": {
+      "concept_id_1": "4186397",
+      "concept_id_2": "4186397",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "776e263d30afc0ce56c08a3f4df2e8cc",
+    "_source": {
+      "concept_id_1": "4198190",
+      "concept_id_2": "4198190",
+      "relationship_id": "Maps to",
+      "valid_start_date": "19700101",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "375680f37fdf49278ab644b846336d41",
+    "_source": {
+      "concept_id_1": "4186397",
+      "concept_id_2": "4185932",
+      "relationship_id": "Is a",
+      "valid_start_date": "20110731",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  },
+  {
+    "_index": "concept-relationship",
+    "_id": "e79ec55830def7dc5906eaba8d950c3b",
+    "_source": {
+      "concept_id_1": "320128",
+      "concept_id_2": "316866",
+      "relationship_id": "Is a",
+      "valid_start_date": "20110731",
+      "valid_end_date": "20991231",
+      "invalid_reason": null
+    }
+  }
+]
