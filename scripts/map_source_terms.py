@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Unified mapping execution script
+Batch mapping CLI: source terms -> OMOP Standard Concepts
 
-Selecting a data source (snuh, snomed, etc.) applies the default CSV path and preprocessing.
+Selecting a dataset (snuh, snomed, etc.) applies its default CSV path and preprocessing.
 Generates three files (JSON (raw), LOG, XLSX) in test_logs/ with the same timestamp.
 
 Usage:
-    python scripts/run_mapping.py snuh
-    python scripts/run_mapping.py snomed
-    python scripts/run_mapping.py snuh --sample-per-domain 5 --random
-    python scripts/run_mapping.py snuh --workers 4   # parallel processing
+    python scripts/map_source_terms.py snuh
+    python scripts/map_source_terms.py snomed
+    python scripts/map_source_terms.py snuh --sample-per-domain 5 --random
+    python scripts/map_source_terms.py snuh --workers 4   # parallel processing
 """
 
 import argparse
@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from MapOMOP.entity_mapping_api import EntityMappingAPI, EntityInput, DomainID
 from MapOMOP.elasticsearch_client import ElasticsearchClient
 
-from mapping_common import (
+from mapping_io import (
     API_LOGGER_NAMES,
     DATA_SOURCES,
     load_snuh_data,
@@ -61,8 +61,6 @@ _worker_api = None
 
 
 def _worker_init(
-    scoring_mode: str,
-    use_validation: bool = False,
     log_file_path: str | None = None,
     capture_only: bool = False,
     llm_provider: str | None = None,
@@ -82,8 +80,6 @@ def _worker_init(
     es_client = ElasticsearchClient()
     _worker_api = EntityMappingAPI(
         es_client=es_client,
-        scoring_mode=scoring_mode,
-        use_validation=use_validation,
         llm_provider=llm_provider,
         llm_model=llm_model,
         llm_base_url=llm_base_url,
@@ -195,10 +191,8 @@ def run_mapping(
     use_random: bool = False,
     random_state: int = 42,
     sample_per_domain: int | None = None,
-    scoring_mode: str = "llm",
     workers: int = 1,
     num_runs: int = 1,
-    use_validation: bool = False,
     llm_provider: str | None = None,
     llm_model: str | None = None,
     llm_base_url: str | None = None,
@@ -210,8 +204,6 @@ def run_mapping(
     """Run mapping: load data (default path + preprocessing) -> map -> output JSON/LOG/XLSX.
     If workers > 1, process in parallel with ProcessPoolExecutor.
     If num_runs > 1, repeat N times on the same data (for consistency verification).
-    use_validation=False (default): use only the highest-scoring mapping based on stage 1-3 scores.
-    use_validation=True: include the LLM validation module. The output file name gets _withval appended.
     """
     from datetime import datetime
     from tqdm import tqdm
@@ -232,9 +224,8 @@ def run_mapping(
     out_path = Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
 
-    data_type_out = f"{data_type}_withval" if use_validation else data_type
     # workers > 1: terminal shows only tqdm progress, detailed logs go to a file
-    logger, log_file = setup_logging(out_path, data_type_out, timestamp, console=(workers == 1))
+    logger, log_file = setup_logging(out_path, data_type, timestamp, console=(workers == 1))
     logger.info("=" * 80)
     logger.info(f"Mapping started: data={data_type}, csv={csv_path}")
     logger.info(f"Preprocessing: {config.get('vocabulary_filter', config.get('filter_domains', 'none'))}")
@@ -277,7 +268,7 @@ def run_mapping(
     workers = max(1, int(workers))
     num_runs = max(1, int(num_runs))
     logger.info(f"Loaded data: {len(df)} rows")
-    logger.info(f"Scoring mode: {scoring_mode}, Workers: {workers}, Runs: {num_runs}, Validation: {'on' if use_validation else 'off'}")
+    logger.info(f"Workers: {workers}, Runs: {num_runs}")
 
     all_results = []  # when num_runs > 1: [run1_results, run2_results, ...]
     start_time = time.time()
@@ -308,8 +299,6 @@ def run_mapping(
                 max_workers=workers,
                 initializer=_worker_init,
                 initargs=(
-                    scoring_mode,
-                    use_validation,
                     str(log_file),
                     True,
                     llm_provider,
@@ -379,8 +368,6 @@ def run_mapping(
             es_client = ElasticsearchClient()
             api = EntityMappingAPI(
                 es_client=es_client,
-                scoring_mode=scoring_mode,
-                use_validation=use_validation,
                 llm_provider=llm_provider,
                 llm_model=llm_model,
                 llm_base_url=llm_base_url,
@@ -470,8 +457,8 @@ def run_mapping(
         # num_runs > 1: save JSON/XLSX immediately after each run completes (no need to wait for all to finish)
         if num_runs > 1:
             completed_runs = len(all_results)
-            save_json({"num_runs": completed_runs, "runs": all_results}, out_path, data_type_out, timestamp)
-            save_xlsx_repeat(all_results, out_path, data_type_out, timestamp)
+            save_json({"num_runs": completed_runs, "runs": all_results}, out_path, data_type, timestamp)
+            save_xlsx_repeat(all_results, out_path, data_type, timestamp)
             logger.info(f"Run {completed_runs}/{num_runs} complete -> JSON/XLSX saved")
 
     elapsed = time.time() - start_time
@@ -503,11 +490,11 @@ def run_mapping(
                 all_same_count += 1
         logger.info(f"Identical results across {num_runs} runs: {all_same_count}/{total} ({100 * all_same_count / total:.2f}%)")
         # Already saved after each run completes. Only log the final paths
-        json_path = out_path / f"mapping_{data_type_out}_{timestamp}.json"
-        xlsx_path = out_path / f"mapping_{data_type_out}_{timestamp}.xlsx"
+        json_path = out_path / f"mapping_{data_type}_{timestamp}.json"
+        xlsx_path = out_path / f"mapping_{data_type}_{timestamp}.xlsx"
     else:
-        json_path = save_json(results, out_path, data_type_out, timestamp)
-        xlsx_path = save_xlsx(results, out_path, data_type_out, timestamp)
+        json_path = save_json(results, out_path, data_type, timestamp)
+        xlsx_path = save_xlsx(results, out_path, data_type, timestamp)
     logger.info(f"JSON: {json_path}")
     logger.info(f"XLSX: {xlsx_path}")
 
@@ -515,7 +502,7 @@ def run_mapping(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="OMOP mapping unified runner")
+    parser = argparse.ArgumentParser(description="Map source terms to OMOP Standard Concepts")
     parser.add_argument(
         "data",
         choices=list(DATA_SOURCES.keys()),
@@ -530,12 +517,6 @@ def main():
         default=None,
         metavar="N",
         help="Sample N per domain. Example: --sample-per-domain 5",
-    )
-    parser.add_argument(
-        "--scoring",
-        default="llm",
-        choices=["llm", "llm_with_score", "semantic"],
-        help="Scoring mode (for ablation study)",
     )
     parser.add_argument(
         "--llm-provider",
@@ -592,12 +573,6 @@ def main():
         metavar="N",
         help="Repeat mapping N times on the same data (for consistency verification). Entering 5 generates a summary + 5 detail sheets.",
     )
-    parser.add_argument(
-        "--validation",
-        action="store_true",
-        help="Include the LLM validation module (default: use only the highest score based on stage 1-3 scores). Output: mapping_{snuh|snomed}_withval_{timestamp}.*",
-    )
-
     args = parser.parse_args()
     llm_api_key = os.getenv(args.llm_api_key_env) if args.llm_api_key_env else None
 
@@ -608,10 +583,8 @@ def main():
         use_random=args.random,
         random_state=args.seed,
         sample_per_domain=args.sample_per_domain,
-        scoring_mode=args.scoring,
         workers=args.workers,
         num_runs=args.repeat,
-        use_validation=args.validation,
         llm_provider=args.llm_provider,
         llm_model=args.llm_model,
         llm_base_url=args.llm_base_url,

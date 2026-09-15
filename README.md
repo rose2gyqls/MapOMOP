@@ -1,39 +1,34 @@
-# OMOP Mapper
+# MapOMOP
 
-OMOP Mapper maps free-text clinical entity names (conditions, drugs, measurements,
-procedures, observations) to **OMOP CDM standard concepts**. It combines
-Elasticsearch retrieval, SapBERT semantic embeddings, and an LLM reranking step,
-and ships with a Streamlit demo, command-line tools, and an evaluation suite.
+MapOMOP maps free-text clinical terms (conditions, drugs, measurements, procedures,
+observations) to **OMOP CDM Standard Concepts**. It combines Elasticsearch retrieval,
+SapBERT semantic embeddings, OMOP concept relationships, and LLM scoring, and ships
+with a Streamlit demo and command-line tools.
 
 A hosted demo is available at **https://mapomop.onrender.com**.
 
 ## Method
 
-Given an entity name and an optional target domain, mapping runs as a three-stage
-pipeline (`src/MapOMOP/`):
+Given a source term and an optional target domain, mapping runs as a three-stage
+pipeline (`src/MapOMOP/mapping_stages/`):
 
 1. **Candidate retrieval** (`stage1_candidate_retrieval.py`)
-   Retrieves candidate concepts from Elasticsearch with three complementary
+   Retrieves candidate concepts from the `concept-small` index with three complementary
    strategies: lexical search (exact / phrase / fuzzy), semantic vector search over
-   SapBERT embeddings, and a hybrid query that combines text, vector, and
-   length similarity. Synonyms are searched and then resolved back to their original
-   concepts.
+   SapBERT embeddings, and a combined query that mixes text, vector, and length
+   similarity. Synonym hits are resolved back to their original concepts.
 
-2. **Standard concept collection** (`stage2_standard_collection.py`)
-   Converts non-standard candidates to OMOP standard concepts by following
-   concept relationships (e.g. `Maps to`), keeping only standard concepts.
+2. **Standard concept collection** (`stage2_standard_concept_collection.py`)
+   Converts candidates to OMOP Standard Concepts (`standard_concept` = `S` or `C`) by
+   following `CONCEPT_RELATIONSHIP` links (e.g. `Is a`, `Tradename of`) and `Maps to`,
+   in two rounds.
 
-3. **Hybrid scoring** (`stage3_hybrid_scoring.py`)
-   Ranks the standard candidates and selects the best mapping. Three scoring modes
-   are supported:
-   - `llm` (default): LLM judgment without numeric similarity in the prompt
-   - `llm_with_score`: LLM judgment with SapBERT semantic similarity in the prompt
-   - `semantic`: SapBERT cosine similarity only
-
-   LLM scoring is provider-agnostic via `LLMClient` (OpenAI and Together AI).
-
-An optional LLM **validation** stage (`mapping_validation.py`, enabled with
-`--validation`) can re-check the selected mapping.
+3. **LLM scoring** (`stage3_llm_scoring.py`)
+   An LLM scores every Standard Concept candidate (0–5) using OMOP hierarchy rules:
+   an equivalent concept is preferred, a parent concept is allowed only when no
+   equivalent exists, and child or meaning-changed concepts are rejected. The top
+   candidate is the final mapping. LLM access is provider-agnostic via `LLMClient`
+   (OpenAI and Together AI).
 
 ## Requirements
 
@@ -44,8 +39,8 @@ An optional LLM **validation** stage (`mapping_validation.py`, enabled with
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/omop-mapper.git
-cd omop-mapper
+git clone https://github.com/rose2gyqls/MapOMOP.git
+cd MapOMOP
 
 python -m venv .venv
 source .venv/bin/activate
@@ -73,8 +68,8 @@ ES_USE_SSL=false
 streamlit run scripts/app.py
 ```
 
-Enter an entity name and a target domain to see the top mapped concept and ranked
-candidates.
+Enter a clinical term and a target domain to see the best Standard Concept and the
+ranked candidates.
 
 ### Python API
 
@@ -88,11 +83,11 @@ results = api.map_entity(entity)
 
 ### Mapping CLI
 
-Runs batch mapping over a dataset and writes `.json`, `.log`, and `.xlsx` to
-`test_logs/`.
+Runs batch mapping over a dataset registered in `scripts/mapping_io.py` and writes
+`.json`, `.log`, and `.xlsx` to `test_logs/`.
 
 ```bash
-./scripts/run_mapping.sh snuh      # or: snomed
+./scripts/map_source_terms.sh snuh      # or: snomed
 ```
 
 Common options:
@@ -100,37 +95,46 @@ Common options:
 | Option | Description |
 | --- | --- |
 | `-n, --sample-size N` | Limit the number of samples |
-| `--sample-per-domain N` | Sample N entities per domain |
+| `--sample-per-domain N` | Sample N terms per domain |
 | `--random`, `--seed N` | Random sampling and seed |
 | `-w, --workers N` | Parallel worker processes |
 | `-r, --repeat N` | Repeat mapping N times (consistency check) |
-| `--scoring {llm,llm_with_score,semantic}` | Stage-3 scoring mode |
 | `--llm-provider {openai,together}`, `--llm-model` | LLM route override |
-| `--validation` | Enable the LLM validation stage |
 
 ### Indexing CLI
 
-Builds the Elasticsearch indexes from OMOP CDM data. Only needed if you maintain
-your own indexes; the demo and mapping CLI just need access to an existing cluster.
+Builds the Elasticsearch indexes from OMOP vocabulary files downloaded from
+[Athena](https://athena.ohdsi.org). Only needed if you maintain your own indexes; the
+demo and mapping CLI just need access to an existing cluster.
 
 ```bash
-./scripts/index.sh                 # local CSV (default)
-./scripts/index.sh postgres        # PostgreSQL source
+./scripts/index_vocabulary.sh                                   # vocabulary folder: data/omop-cdm
+./scripts/index_vocabulary.sh --data-folder /path/to/vocabulary
 ```
 
-The PostgreSQL path additionally needs `PG_HOST`, `PG_PORT`, `PG_DBNAME`, `PG_USER`,
-and `PG_PASSWORD` in `.env`.
+| Index | Source | Used by |
+| --- | --- | --- |
+| `concept-small` | `CONCEPT` + English `CONCEPT_SYNONYM` (built by `create_concept_small.py`), with SapBERT embeddings | Stage 1, Stage 2 |
+| `concept-relationship` | `CONCEPT_RELATIONSHIP` (relationships used by Stage 2 only) | Stage 2 |
+| `concept-synonym` | `CONCEPT_SYNONYM` | Synonym lookup (`ElasticsearchClient.search_synonyms`) |
 
-### Evaluation
+## Data Samples
 
-`eval/` contains scripts that build the run-20 mapping logs, consensus
-evaluation workbooks, and baseline comparisons used in the study. They read and
-write a working directory specified by `--base` or the `OMOP_EVAL_BASE`
-environment variable:
+[`samples/`](./samples) contains small real examples of every data format, with a
+[walkthrough](./samples/README.md):
 
-```bash
-export OMOP_EVAL_BASE=/path/to/eval-data
-python eval/build_run20_logs.py
+| Folder | Contents |
+| --- | --- |
+| [`samples/vocabulary/`](./samples/vocabulary) | Athena vocabulary rows: `CONCEPT`, `CONCEPT_SYNONYM`, `CONCEPT_RELATIONSHIP` (10 each) and the derived `CONCEPT_SMALL` |
+| [`samples/index/`](./samples/index) | The same rows as indexed Elasticsearch documents |
+| [`samples/mapping/`](./samples/mapping) | 10 source terms and their mapping results (Stage 1–3 candidates, LLM reasoning) |
+
+For example, one `CONCEPT` row becomes one `concept-small` document:
+
+```text
+CONCEPT.csv   4186397 | Myocardial ischemia | Condition | SNOMED | Disorder | S | 414795007 | 20050131 | 20991231 |
+concept-small {"concept_id": "4186397", "concept_name": "myocardial ischemia", "name_type": "Original",
+               "standard_concept": "S", ..., "concept_embedding": [-0.0267, -0.2156, 0.0397, ... 128 dims]}
 ```
 
 ## Deployment
@@ -150,14 +154,12 @@ streamlit run scripts/app.py --server.port $PORT --server.address 0.0.0.0 --serv
 | Variable | Required | Description |
 | --- | --- | --- |
 | `OPENAI_API_KEY` | Yes | OpenAI API key for LLM scoring |
-| `OPENAI_MODEL` | No | OpenAI model override |
+| `OPENAI_MODEL` | No | OpenAI model override (default `gpt-5-mini-2025-08-07`) |
 | `ES_SERVER_HOST` | Yes | Elasticsearch host |
 | `ES_SERVER_PORT` | No | Elasticsearch port (default `9200`) |
 | `ES_SERVER_USERNAME` | Yes | Elasticsearch username |
 | `ES_SERVER_PASSWORD` | Yes | Elasticsearch password |
 | `ES_USE_SSL` | No | `true` or `false` (default `false`) |
-| `PG_*` | Indexing only | PostgreSQL connection for the indexing CLI |
-| `OMOP_EVAL_BASE` | Eval only | Working directory for `eval/` scripts |
 
 Never commit `.env`. Keep Elasticsearch credentials out of tracked source files and
 prefer read-only credentials for demo users.
@@ -165,18 +167,32 @@ prefer read-only credentials for demo users.
 ## Project Structure
 
 ```text
-omop-mapper/
-├── src/MapOMOP/          # Core mapping package (3-stage pipeline + validation)
-├── indexing/             # Elasticsearch index-building pipeline
-├── scripts/              # CLIs and wrappers
-│   ├── app.py            # Streamlit demo
-│   ├── run_mapping.py    # Mapping CLI        (run_mapping.sh)
-│   ├── run_indexing.py   # Indexing CLI       (index.sh)
-│   ├── prepare_concept_small.py  # CONCEPT_SMALL.csv builder
-│   └── mapping_common.py # Shared data loading / output helpers
-├── eval/                 # Evaluation and analysis scripts
+MapOMOP/
+├── src/MapOMOP/                            # Core mapping package
+│   ├── entity_mapping_api.py               # EntityMappingAPI (pipeline entry point)
+│   ├── mapping_stages/
+│   │   ├── stage1_candidate_retrieval.py
+│   │   ├── stage2_standard_concept_collection.py
+│   │   └── stage3_llm_scoring.py
+│   ├── elasticsearch_client.py
+│   ├── llm_client.py
+│   └── utils.py                            # Embedding projection, deduplication
+├── indexing/                               # Elasticsearch index-building pipeline
+│   ├── data_sources/
+│   │   ├── base.py
+│   │   └── read_vocabulary.py              # Athena vocabulary CSV reader
+│   ├── vocabulary_indexer.py               # Orchestrates indexing per table
+│   ├── elasticsearch_indexer.py
+│   └── sapbert_embedder.py
+├── scripts/                                # CLIs and wrappers
+│   ├── app.py                              # Streamlit demo
+│   ├── map_source_terms.py                 # Mapping CLI   (map_source_terms.sh)
+│   ├── mapping_io.py                       # Dataset loading, logging, JSON/XLSX output
+│   ├── index_vocabulary.py                 # Indexing CLI  (index_vocabulary.sh)
+│   └── create_concept_small.py             # CONCEPT_SMALL.csv builder
+├── samples/                                # Data samples (see samples/README.md)
 ├── requirements.txt
-├── render.yaml           # Render deployment blueprint
+├── render.yaml                             # Render deployment blueprint
 └── .env.example
 ```
 

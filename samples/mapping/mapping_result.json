@@ -1,0 +1,2556 @@
+[
+  {
+    "test_index": 1,
+    "id": "0",
+    "row_id": "0",
+    "entity_name": "Corneal erosion",
+    "input_domain": "Condition",
+    "ground_truth_concept_id": 4179918,
+    "ground_truth_concept_name": "corneal erosion",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Condition",
+    "best_concept_id": "4179918",
+    "best_concept_name": "corneal erosion",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "4179918",
+        "concept_name": "corneal erosion",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "elasticsearch_score": 0.999982752912119,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3105516",
+        "concept_name": "recurrent corneal erosion",
+        "domain_id": "Condition",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999616924884982,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3142407",
+        "concept_name": "recurrent corneal erosion",
+        "domain_id": "Condition",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999616924884982,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45616521",
+        "concept_name": "corneal ulcer",
+        "domain_id": "Condition",
+        "vocabulary_id": "MeSH",
+        "standard_concept": null,
+        "elasticsearch_score": 0.91277397,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "3105511",
+        "concept_name": "corneal ulcer",
+        "domain_id": "Condition",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.91277397,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "4179918",
+        "concept_name": "corneal erosion",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "search_type": "lexical",
+        "relation_type": "original",
+        "elasticsearch_score": 0.999982752912119
+      },
+      {
+        "concept_id": "378752",
+        "concept_name": "corneal opacity",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3105516",
+          "concept_name": "recurrent corneal erosion"
+        }
+      },
+      {
+        "concept_id": "373202",
+        "concept_name": "corneal ulcer",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "45616521",
+          "concept_name": "corneal ulcer"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "4179918",
+        "concept_name": "corneal erosion",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "This candidate is semantically equivalent to the entity 'corneal erosion' as it matches all defining attributes without any alteration or omission.",
+        "final_score": 5.0,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "373202",
+        "concept_name": "corneal ulcer",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.5,
+        "llm_rank": 2,
+        "llm_reasoning": "This candidate represents 'corneal ulcer', which is a different condition than 'corneal erosion'. It is not equivalent and does not contain the meaning of the entity. Therefore, it is classified as meaning-changed.",
+        "final_score": 1.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "45616521",
+          "concept_name": "corneal ulcer"
+        }
+      },
+      {
+        "concept_id": "378752",
+        "concept_name": "corneal opacity",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 3,
+        "llm_reasoning": "This candidate represents 'corneal opacity', which is a different condition than 'corneal erosion'. It is not equivalent and does not contain the meaning of the entity. Therefore, it is classified as meaning-changed.",
+        "final_score": 1.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3105516",
+          "concept_name": "recurrent corneal erosion"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 7,
+    "id": "6",
+    "row_id": "6",
+    "entity_name": "Atrial fibrillation",
+    "input_domain": "Condition",
+    "ground_truth_concept_id": 313217,
+    "ground_truth_concept_name": "atrial fibrillation",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Condition",
+    "best_concept_id": "313217",
+    "best_concept_name": "atrial fibrillation",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "45951191",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "CIEL",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999767607288778,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "44821957",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD9CM",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999767607288778,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45611600",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "MeSH",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999767607288778,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3170870",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9998373,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "40323929",
+        "concept_name": "(atrial fibrillation) or (atrial flutter)",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9998176,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "313217",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "45951191",
+          "concept_name": "atrial fibrillation"
+        }
+      },
+      {
+        "concept_id": "4068155",
+        "concept_name": "atrial arrhythmia",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "40323929",
+          "concept_name": "(atrial fibrillation) or (atrial flutter)"
+        }
+      },
+      {
+        "concept_id": "314665",
+        "concept_name": "atrial flutter",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Concept poss_eq to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "40323929",
+          "concept_name": "(atrial fibrillation) or (atrial flutter)"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "313217",
+        "concept_name": "atrial fibrillation",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "This candidate is semantically equivalent to the entity 'Atrial fibrillation' as it has the same clinical meaning with no additional or missing attributes.",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "45951191",
+          "concept_name": "atrial fibrillation"
+        }
+      },
+      {
+        "concept_id": "4068155",
+        "concept_name": "atrial arrhythmia",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.0,
+        "llm_rank": 2,
+        "llm_reasoning": "This candidate 'atrial arrhythmia' is a broader concept that includes atrial fibrillation but also encompasses other types of atrial arrhythmias. Therefore, it is classified as a Parent concept and cannot be equivalent.",
+        "final_score": 4.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "40323929",
+          "concept_name": "(atrial fibrillation) or (atrial flutter)"
+        }
+      },
+      {
+        "concept_id": "314665",
+        "concept_name": "atrial flutter",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 3,
+        "llm_reasoning": "This candidate 'atrial flutter' is a narrower concept that refers specifically to a different type of atrial arrhythmia. It is not equivalent to atrial fibrillation and introduces new meaning, thus it is classified as a Child concept.",
+        "final_score": 1.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "40323929",
+          "concept_name": "(atrial fibrillation) or (atrial flutter)"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 13,
+    "id": "12",
+    "row_id": "12",
+    "entity_name": "Acute myocardial infarction",
+    "input_domain": "Condition",
+    "ground_truth_concept_id": 312327,
+    "ground_truth_concept_name": "acute myocardial infarction",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Condition",
+    "best_concept_id": "312327",
+    "best_concept_name": "acute myocardial infarction",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "1569126",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10CM",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999989125973415,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45538370",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999989125973415,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "1413785",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10CN",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999989125973415,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "37084476",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10GM",
+        "standard_concept": null,
+        "elasticsearch_score": 1.0001441,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "44832372",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD9CM",
+        "standard_concept": null,
+        "elasticsearch_score": 0.999918,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "40345176",
+        "concept_name": "myocardial infarction (& [acute]) or coronary thrombosis",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": null,
+        "elasticsearch_score": 1.000342,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "312327",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "1569126",
+          "concept_name": "acute myocardial infarction"
+        }
+      },
+      {
+        "concept_id": "4134723",
+        "concept_name": "coronary artery thrombosis",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "40345176",
+          "concept_name": "myocardial infarction (& [acute]) or coronary thrombosis"
+        }
+      },
+      {
+        "concept_id": "4329847",
+        "concept_name": "myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Concept poss_eq to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "40345176",
+          "concept_name": "myocardial infarction (& [acute]) or coronary thrombosis"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "312327",
+        "concept_name": "acute myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "This candidate is semantically equivalent to the entity 'acute myocardial infarction' as it matches all defining attributes without any alterations. Therefore, it receives the highest score.",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "1569126",
+          "concept_name": "acute myocardial infarction"
+        }
+      },
+      {
+        "concept_id": "4134723",
+        "concept_name": "coronary artery thrombosis",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.0,
+        "llm_rank": 2,
+        "llm_reasoning": "This candidate refers to 'coronary artery thrombosis', which is not equivalent to 'acute myocardial infarction' as it introduces a broader context that includes thrombosis, which is not necessarily synonymous with myocardial infarction. It is a parent concept but not equivalent.",
+        "final_score": 3.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "40345176",
+          "concept_name": "myocardial infarction (& [acute]) or coronary thrombosis"
+        }
+      },
+      {
+        "concept_id": "4329847",
+        "concept_name": "myocardial infarction",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 2.0,
+        "llm_rank": 3,
+        "llm_reasoning": "This candidate 'myocardial infarction' is a broader term that includes both acute and chronic forms. Since it does not specify 'acute', it is not equivalent to the entity and is considered a parent concept.",
+        "final_score": 2.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "40345176",
+          "concept_name": "myocardial infarction (& [acute]) or coronary thrombosis"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 11,
+    "id": "10",
+    "row_id": "10",
+    "entity_name": "Polycystic ovarian syndrome",
+    "input_domain": "Condition",
+    "ground_truth_concept_id": 40443308,
+    "ground_truth_concept_name": "polycystic ovary syndrome",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Condition",
+    "best_concept_id": "40443308",
+    "best_concept_name": "polycystic ovary syndrome",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "45533028",
+        "concept_name": "polycystic ovarian syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999996203905515,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "1409495",
+        "concept_name": "polycystic ovarian syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10CN",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999996203905515,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "1409496",
+        "concept_name": "polycystic ovarian syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "ICD10CN",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999996203905515,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45616856",
+        "concept_name": "polycystic ovary syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "MeSH",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9997587,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "195501",
+        "concept_name": "polycystic ovaries",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": null,
+        "elasticsearch_score": 0.999738,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "40443308",
+        "concept_name": "polycystic ovary syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "45533028",
+          "concept_name": "polycystic ovarian syndrome"
+        }
+      },
+      {
+        "concept_id": "36683296",
+        "concept_name": "polycystic ovary",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "195501",
+          "concept_name": "polycystic ovaries"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "40443308",
+        "concept_name": "polycystic ovary syndrome",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "The concept 'polycystic ovary syndrome' is semantically equivalent to the entity 'polycystic ovarian syndrome' as they refer to the same clinical condition. The original concept name also confirms this equivalence. Therefore, it receives the highest score of 5.0.",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "45533028",
+          "concept_name": "polycystic ovarian syndrome"
+        }
+      },
+      {
+        "concept_id": "36683296",
+        "concept_name": "polycystic ovary",
+        "domain_id": "Condition",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 2,
+        "llm_reasoning": "The concept 'polycystic ovary' is a narrower term that refers specifically to the ovaries being polycystic, which is a characteristic of the broader condition of polycystic ovarian syndrome. This introduces a new meaning by focusing only on the ovaries and not the syndrome as a whole. Therefore, it is classified as a Child concept and receives a score of 1.0.",
+        "final_score": 1.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "195501",
+          "concept_name": "polycystic ovaries"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 2,
+    "id": "1",
+    "entity_name": "Lamotrigine 100mg tab",
+    "input_domain": "Drug",
+    "row_id": "1",
+    "ground_truth_concept_id": 705108,
+    "ground_truth_concept_name": "lamotrigine 100 mg oral tablet",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Drug",
+    "best_concept_id": "705108",
+    "best_concept_name": "lamotrigine 100 mg oral tablet",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "42850630",
+        "concept_name": "lamotrigine 100mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "NDFRT",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999786059351806,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "42541588",
+        "concept_name": "lamotrigine 100mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "NDFRT",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999786059351806,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "4322443",
+        "concept_name": "lamotrigine 100mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "VANDF",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999786059351806,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "21220622",
+        "concept_name": "lamotrigine 100mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9973872,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "21239137",
+        "concept_name": "lamotrigine 100mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9973872,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "21295078",
+        "concept_name": "lamotrigine 100mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9973872,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "705108",
+        "concept_name": "lamotrigine 100 mg oral tablet",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "42850630",
+          "concept_name": "lamotrigine 100mg tab"
+        }
+      },
+      {
+        "concept_id": "36955493",
+        "concept_name": "lamotrigine 100 mg oral tablet by viatris healthcare",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21220622",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      },
+      {
+        "concept_id": "21035406",
+        "concept_name": "lamotrigine 100 mg oral tablet by actavis",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21239137",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      },
+      {
+        "concept_id": "21143434",
+        "concept_name": "lamotrigine 100 mg oral tablet by ivax",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21295078",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "705108",
+        "concept_name": "lamotrigine 100 mg oral tablet",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Classification: Fully Equivalent. Matches all defining attributes after normalization: active ingredient = lamotrigine, strength = 100 mg, dose form = oral tablet. The original_concept_name ('lamotrigine 100mg tab') is semantically equivalent to the entity and the standard concept preserves the same clinical meaning with no added or missing attributes. Therefore this is an equivalent mapping.",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "42850630",
+          "concept_name": "lamotrigine 100mg tab"
+        }
+      },
+      {
+        "concept_id": "36955493",
+        "concept_name": "lamotrigine 100 mg oral tablet by viatris healthcare",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.5,
+        "llm_rank": 2,
+        "llm_reasoning": "Classification: Child (Narrower). The concept is lamotrigine 100 mg oral tablet by Viatris Healthcare. While ingredient, strength and form match the entity, the candidate adds manufacturer/brand information (Viatris) which is an additional attribute (more specific) and therefore a narrower/child concept. The original_concept_name ('lamotrigine 100mg tablets') is equivalent, but the standard concept's added manufacturer makes it a child and thus invalid as an equivalent mapping.",
+        "final_score": 1.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21220622",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      },
+      {
+        "concept_id": "21035406",
+        "concept_name": "lamotrigine 100 mg oral tablet by actavis",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 3,
+        "llm_reasoning": "Classification: Child (Narrower). The concept is lamotrigine 100 mg oral tablet by Actavis. Core clinical attributes (ingredient, 100 mg, oral tablet) match, but the candidate introduces manufacturer/brand (Actavis) which is an added attribute making it more specific than the entity (a child concept). Therefore it is not an acceptable equivalent mapping.",
+        "final_score": 1.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21239137",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      },
+      {
+        "concept_id": "21143434",
+        "concept_name": "lamotrigine 100 mg oral tablet by ivax",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 0.5,
+        "llm_rank": 4,
+        "llm_reasoning": "Classification: Child (Narrower). The concept is lamotrigine 100 mg oral tablet by Ivax. Ingredient, strength and form match the entity, but the inclusion of manufacturer/brand (Ivax) adds specificity (child concept). As a result it is narrower than the entity and not an equivalent mapping.",
+        "final_score": 0.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21295078",
+          "concept_name": "lamotrigine 100mg tablets"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 24,
+    "id": "23",
+    "entity_name": "Sertraline 50mg tab",
+    "input_domain": "Drug",
+    "row_id": "23",
+    "ground_truth_concept_id": 739209,
+    "ground_truth_concept_name": "sertraline 50 mg oral tablet",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Drug",
+    "best_concept_id": "739209",
+    "best_concept_name": "sertraline 50 mg oral tablet",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "4318908",
+        "concept_name": "sertraline hcl 50mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "NDFRT",
+        "standard_concept": null,
+        "elasticsearch_score": 0.968804776276172,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "42855089",
+        "concept_name": "sertraline hcl 50mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "NDFRT",
+        "standard_concept": null,
+        "elasticsearch_score": 0.968804776276172,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "42551800",
+        "concept_name": "sertraline hcl 50mg tab",
+        "domain_id": "Drug",
+        "vocabulary_id": "NDFRT",
+        "standard_concept": null,
+        "elasticsearch_score": 0.968804776276172,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "21183322",
+        "concept_name": "sertraline 50mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.99540806,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "21220768",
+        "concept_name": "sertraline 50mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.99540806,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "21296086",
+        "concept_name": "sertraline 50mg tablets",
+        "domain_id": "Drug",
+        "vocabulary_id": "dm+d",
+        "standard_concept": null,
+        "elasticsearch_score": 0.99540806,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "739209",
+        "concept_name": "sertraline 50 mg oral tablet",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "42855089",
+          "concept_name": "sertraline hcl 50mg tab"
+        }
+      },
+      {
+        "concept_id": "21150062",
+        "concept_name": "sertraline 50 mg oral tablet by relonchem",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21183322",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      },
+      {
+        "concept_id": "21081343",
+        "concept_name": "sertraline 50 mg oral tablet by focus",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21220768",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      },
+      {
+        "concept_id": "21130285",
+        "concept_name": "sertraline 50 mg oral tablet by tillomed",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "21296086",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "739209",
+        "concept_name": "sertraline 50 mg oral tablet",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Classification: Equivalent. Step-by-step: Entity = sertraline 50mg tablet (oral). Candidate concept_name = \"sertraline 50 mg oral tablet\" and original_concept_name = \"sertraline hcl 50mg tab\". Matches ingredient (sertraline / sertraline HCl), strength (50 mg), dose form (oral tablet) and no additional attributes (no manufacturer, packaging, or differing volume). All defining attributes match after normalization → fully equivalent.",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "42855089",
+          "concept_name": "sertraline hcl 50mg tab"
+        }
+      },
+      {
+        "concept_id": "21150062",
+        "concept_name": "sertraline 50 mg oral tablet by relonchem",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.5,
+        "llm_rank": 2,
+        "llm_reasoning": "Classification: Child (Narrower). Step-by-step: concept_name = \"sertraline 50 mg oral tablet by relonchem\" adds a manufacturer/brand attribute compared with the entity. Original_concept_name = \"sertraline 50mg tablets\" is semantically equivalent to the entity, but the STANDARD concept includes the extra manufacturer detail. Manufacturer/brand is an additional specification (device/packaging/brand) which makes the concept narrower (child). Because it is a child (adds clinical/administrative detail), it is not an allowed Equivalent mapping when an exact unbranded equivalent exists.",
+        "final_score": 1.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21183322",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      },
+      {
+        "concept_id": "21081343",
+        "concept_name": "sertraline 50 mg oral tablet by focus",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 3,
+        "llm_reasoning": "Classification: Child (Narrower). Step-by-step: concept_name = \"sertraline 50 mg oral tablet by focus\" adds a manufacturer/brand attribute relative to the entity. Original_concept_name = \"sertraline 50mg tablets\" would be equivalent, but the mapped standard concept includes the brand, making it a narrower concept (additional attribute). Therefore it is a child and not acceptable as the primary mapping when an unbranded equivalent exists.",
+        "final_score": 1.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21220768",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      },
+      {
+        "concept_id": "21130285",
+        "concept_name": "sertraline 50 mg oral tablet by tillomed",
+        "domain_id": "Drug",
+        "vocabulary_id": "RxNorm Extension",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 0.5,
+        "llm_rank": 4,
+        "llm_reasoning": "Classification: Child (Narrower). Step-by-step: concept_name = \"sertraline 50 mg oral tablet by tillomed\" includes manufacturer/brand detail beyond the entity. Original_concept_name = \"sertraline 50mg tablets\" is equivalent, but the standard concept's added brand attribute narrows the meaning (child). Thus it is a narrower concept and not appropriate compared with the exact unbranded equivalent.",
+        "final_score": 0.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "21296086",
+          "concept_name": "sertraline 50mg tablets"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 8,
+    "id": "7",
+    "entity_name": "Systolic Blood Pressure",
+    "input_domain": "Measurement",
+    "row_id": "7",
+    "ground_truth_concept_id": 3004249,
+    "ground_truth_concept_name": "systolic blood pressure",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Measurement",
+    "best_concept_id": "3004249",
+    "best_concept_name": "systolic blood pressure",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "45917987",
+        "concept_name": "systolic blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "CIEL",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999959076516843,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3955453",
+        "concept_name": "systolic blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "CO-CONNECT TWINS",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999959076516843,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3004249",
+        "concept_name": "systolic blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "S",
+        "elasticsearch_score": 0.9999959076516843,
+        "search_type": "lexical"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "3004249",
+        "concept_name": "systolic blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "search_type": "lexical",
+        "relation_type": "original",
+        "elasticsearch_score": 0.9999959076516843
+      },
+      {
+        "concept_id": "40654167",
+        "concept_name": "intravascular systolic|pressure|moment in time|without specimen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      },
+      {
+        "concept_id": "45876175",
+        "concept_name": "blood pressure atomic",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      },
+      {
+        "concept_id": "1003020",
+        "concept_name": "intravascular systolic | arterial system | general blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      },
+      {
+        "concept_id": "40652452",
+        "concept_name": "flowsheet - vital signs",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "40654167",
+          "concept_name": "intravascular systolic|pressure|moment in time|without specimen"
+        }
+      },
+      {
+        "concept_id": "45876174",
+        "concept_name": "blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "45876175",
+          "concept_name": "blood pressure atomic"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "3004249",
+        "concept_name": "systolic blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Classification: Equivalent. Reason: Concept name is exactly 'systolic blood pressure' and matches the entity's defining attribute (systolic component of blood pressure) with no added or missing specifications. Meets the mandatory equivalence check (ingredient/measure = systolic BP). Therefore must be chosen as the exact equivalent.",
+        "final_score": 5.0,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45876174",
+        "concept_name": "blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "llm_score": 4.6,
+        "llm_rank": 2,
+        "llm_reasoning": "Classification: Parent (Broader). Reason: 'blood pressure' omits the defining attribute 'systolic' present in the entity. This candidate is therefore more general (it could represent systolic, diastolic, or combined blood pressure) and lacks the specific systolic attribute — a classic Parent. Since an Equivalent exists (3004249), this Parent must score lower than the Equivalent.",
+        "final_score": 4.6,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "45876175",
+          "concept_name": "blood pressure atomic"
+        }
+      },
+      {
+        "concept_id": "45876175",
+        "concept_name": "blood pressure atomic",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "llm_score": 4.2,
+        "llm_rank": 3,
+        "llm_reasoning": "Classification: Parent (Broader). Reason: 'blood pressure atomic' does not specify 'systolic' and therefore is missing the defining attribute of the entity (systolic). It is a more generic/technical blood pressure atomic data element and thus a broader concept than 'systolic blood pressure'. Not equivalent because it omits the systolic specificity.",
+        "final_score": 4.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      },
+      {
+        "concept_id": "40652452",
+        "concept_name": "flowsheet - vital signs",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "llm_score": 3.6,
+        "llm_rank": 4,
+        "llm_reasoning": "Classification: Parent (Broader). Reason: 'flowsheet - vital signs' is a container/grouping concept (a vital signs flowsheet), not a specific measurement of systolic BP. It lacks the systolic attribute and is therefore much broader (a dataset/section), so it is a Parent (broader) concept, not equivalent.",
+        "final_score": 3.6,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "40654167",
+          "concept_name": "intravascular systolic|pressure|moment in time|without specimen"
+        }
+      },
+      {
+        "concept_id": "40654167",
+        "concept_name": "intravascular systolic|pressure|moment in time|without specimen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "llm_score": 1.2,
+        "llm_rank": 5,
+        "llm_reasoning": "Classification: Child (Narrower). Reason: 'intravascular systolic|pressure|moment in time|without specimen' adds the attribute 'intravascular' (invasive measurement modality) and specifies measurement context (moment in time, without specimen). These are additional constraints not present in the entity (which does not restrict route/method), making this candidate narrower (a Child). Per rules, Child concepts are not acceptable mappings and must receive ≤1.5.",
+        "final_score": 1.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      },
+      {
+        "concept_id": "1003020",
+        "concept_name": "intravascular systolic | arterial system | general blood pressure",
+        "domain_id": "Measurement",
+        "vocabulary_id": "LOINC",
+        "standard_concept": "C",
+        "is_original_standard": false,
+        "llm_score": 0.8,
+        "llm_rank": 6,
+        "llm_reasoning": "Classification: Child (Narrower). Reason: 'intravascular systolic | arterial system | general blood pressure' explicitly adds 'intravascular' and 'arterial system' (anatomic/method specificity) beyond the entity. That makes it more specific (narrower) than the generic 'systolic blood pressure' entity which does not require an intravascular/arterial method. Therefore it is a Child and not equivalent.",
+        "final_score": 0.8,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3004249",
+          "concept_name": "systolic blood pressure"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 24,
+    "id": "23",
+    "entity_name": "Blood Urea Nitrogen",
+    "input_domain": "Measurement",
+    "row_id": "23",
+    "ground_truth_concept_id": 3013682,
+    "ground_truth_concept_name": "urea nitrogen [mass/volume] in serum or plasma",
+    "success": true,
+    "mapping_correct": false,
+    "best_result_domain": "Measurement",
+    "best_concept_id": "4017361",
+    "best_concept_name": "blood urea nitrogen measurement",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "45912124",
+        "concept_name": "blood urea nitrogen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "CIEL",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999873134532454,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45616467",
+        "concept_name": "blood urea nitrogen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "MeSH",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999873134532454,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "3453180",
+        "concept_name": "blood urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999719287762344,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "4017361",
+        "concept_name": "blood urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "elasticsearch_score": 0.99177074,
+        "search_type": "semantic"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "4094594",
+        "concept_name": "blood urea measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "45616467",
+          "concept_name": "blood urea nitrogen"
+        }
+      },
+      {
+        "concept_id": "4017361",
+        "concept_name": "blood urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "search_type": "semantic",
+        "relation_type": "original",
+        "elasticsearch_score": 0.99177074
+      },
+      {
+        "concept_id": "4074649",
+        "concept_name": "urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3426792",
+          "concept_name": "urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "37203929",
+        "concept_name": "measurement of level of substance in blood",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4017361",
+          "concept_name": "blood urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "4020121",
+        "concept_name": "urea measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4094594",
+          "concept_name": "blood urea measurement"
+        }
+      },
+      {
+        "concept_id": "4017216",
+        "concept_name": "non-protein nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4074649",
+          "concept_name": "urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "4334965",
+        "concept_name": "measurement of substance in specimen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "37203929",
+          "concept_name": "measurement of level of substance in blood"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "4017361",
+        "concept_name": "blood urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Classification: Equivalent. Exact semantic match: concept_name is 'blood urea nitrogen measurement', which matches the entity 'Blood Urea Nitrogen' including specimen (blood) and analyte (urea nitrogen). No attributes are missing or added. Therefore this is the best equivalent and receives the top score.",
+        "final_score": 5.0,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "4094594",
+        "concept_name": "blood urea measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.8,
+        "llm_rank": 2,
+        "llm_reasoning": "Classification: Equivalent (mapped-from evidence). The standard concept_name is 'blood urea measurement' which omits the word 'nitrogen', but the original_concept_name is explicitly 'blood urea nitrogen' (semantically equivalent to the entity). The original mapping indicates intended equivalence and the standard concept does not introduce a clear, justifying meaning change. Classified as equivalent to the entity but ranked just below the exact-named equivalent.",
+        "final_score": 4.8,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "45616467",
+          "concept_name": "blood urea nitrogen"
+        }
+      },
+      {
+        "concept_id": "4074649",
+        "concept_name": "urea nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.0,
+        "llm_rank": 3,
+        "llm_reasoning": "Classification: Parent (Broader). 'urea nitrogen measurement' names the analyte (urea nitrogen) but omits the specimen ('blood'). Omitting 'blood' broadens scope to any specimen (e.g., urine), so it is broader than the entity and not fully equivalent.",
+        "final_score": 4.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3426792",
+          "concept_name": "urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "4020121",
+        "concept_name": "urea measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.2,
+        "llm_rank": 4,
+        "llm_reasoning": "Classification: Parent (Broader). 'urea measurement' omits both 'blood' (specimen) and the explicit 'nitrogen' qualifier; it refers to measuring urea generally and is therefore broader than the specific blood urea nitrogen test. Missing defining attributes -> Parent.",
+        "final_score": 3.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4094594",
+          "concept_name": "blood urea measurement"
+        }
+      },
+      {
+        "concept_id": "4017216",
+        "concept_name": "non-protein nitrogen measurement",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 2.4,
+        "llm_rank": 5,
+        "llm_reasoning": "Classification: Parent (Broader). 'non-protein nitrogen measurement' is a broader category that includes multiple analytes (urea nitrogen is one of them). This expands scope beyond the specific urea nitrogen-in-blood measurement, so it is a broader concept.",
+        "final_score": 2.4,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4074649",
+          "concept_name": "urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "37203929",
+        "concept_name": "measurement of level of substance in blood",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.6,
+        "llm_rank": 6,
+        "llm_reasoning": "Classification: Parent (Broader). 'measurement of level of substance in blood' preserves the blood specimen but omits any specification of the substance (urea nitrogen). It is a very general blood-level measurement concept and thus broader than the entity.",
+        "final_score": 1.6,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4017361",
+          "concept_name": "blood urea nitrogen measurement"
+        }
+      },
+      {
+        "concept_id": "4334965",
+        "concept_name": "measurement of substance in specimen",
+        "domain_id": "Measurement",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.0,
+        "llm_rank": 7,
+        "llm_reasoning": "Classification: Parent (Broader, very generic). 'measurement of substance in specimen' omits both the specimen type (blood) and the specific analyte; it is an extremely general measurement concept and therefore much broader than 'Blood Urea Nitrogen'.",
+        "final_score": 1.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "37203929",
+          "concept_name": "measurement of level of substance in blood"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 2,
+    "id": "1",
+    "entity_name": "Closed [endoscopic] biopsy of stomach",
+    "input_domain": "Procedure",
+    "row_id": "1",
+    "ground_truth_concept_id": 4004241,
+    "ground_truth_concept_name": "endoscopic biopsy of stomach",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Procedure",
+    "best_concept_id": "4004241",
+    "best_concept_name": "endoscopic biopsy of stomach",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "36905442",
+        "concept_name": "closed [endoscopic] biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9ProcCN",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999993770670029,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "36905242",
+        "concept_name": "closed [endoscopic] biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9ProcCN",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999993770670029,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "2002586",
+        "concept_name": "closed [endoscopic] biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9Proc",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999993770670029,
+        "search_type": "lexical"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "4004241",
+        "concept_name": "endoscopic biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "36905442",
+          "concept_name": "closed [endoscopic] biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "2002582",
+        "concept_name": "diagnostic procedures on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9Proc",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "36903805",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      },
+      {
+        "concept_id": "4193376",
+        "concept_name": "biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4297516",
+        "concept_name": "endoscopy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4202517",
+        "concept_name": "endoscopic biopsy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4108616",
+        "concept_name": "examination of body system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "2002566",
+        "concept_name": "other operations on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9Proc",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "2002582",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      },
+      {
+        "concept_id": "4042680",
+        "concept_name": "procedure on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "2002582",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "4004241",
+        "concept_name": "endoscopic biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Equivalent. Candidate concept_name 'endoscopic biopsy of stomach' exactly matches the entity meaning. The original_concept_name explicitly is 'closed [endoscopic] biopsy of stomach', which is semantically identical to the entity. No attributes are missing or added. (Equivalent)",
+        "final_score": 5.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "36905442",
+          "concept_name": "closed [endoscopic] biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4193376",
+        "concept_name": "biopsy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.6,
+        "llm_rank": 2,
+        "llm_reasoning": "Parent (Broader). 'biopsy of stomach' omits the approach/technique attribute 'endoscopic'. It is a broader concept that contains the entity (all endoscopic biopsies of stomach are biopsies of stomach) but lacks the defining attribute 'endoscopic', so it is not equivalent.",
+        "final_score": 4.6,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4297516",
+        "concept_name": "endoscopy of stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.4,
+        "llm_rank": 3,
+        "llm_reasoning": "Parent (Broader). 'endoscopy of stomach' specifies the endoscopic approach and the stomach site but omits the biopsy action (examination only). It is broader with respect to the procedural intent (no biopsy specified), so not equivalent.",
+        "final_score": 4.4,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "4202517",
+        "concept_name": "endoscopic biopsy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.2,
+        "llm_rank": 4,
+        "llm_reasoning": "Parent (Broader). 'endoscopic biopsy' specifies approach and procedure type but omits the anatomic site (stomach). It is broader because it includes endoscopic biopsies at any site, therefore not equivalent.",
+        "final_score": 4.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      },
+      {
+        "concept_id": "2002582",
+        "concept_name": "diagnostic procedures on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9Proc",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.6,
+        "llm_rank": 5,
+        "llm_reasoning": "Parent (Broader). 'diagnostic procedures on stomach' is a broad category that can include endoscopic biopsy but omits the specific procedure (biopsy) and the method; it fully contains the entity but lacks defining procedural detail.",
+        "final_score": 3.6,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "36903805",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      },
+      {
+        "concept_id": "4042680",
+        "concept_name": "procedure on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.2,
+        "llm_rank": 6,
+        "llm_reasoning": "Parent (Broader). 'procedure on stomach' is a very general parent that includes diagnostic and therapeutic procedures (including biopsies), but it omits both the biopsy action and the endoscopic approach, thus broader and not equivalent.",
+        "final_score": 3.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "2002582",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      },
+      {
+        "concept_id": "2002566",
+        "concept_name": "other operations on stomach",
+        "domain_id": "Procedure",
+        "vocabulary_id": "ICD9Proc",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 2.8,
+        "llm_rank": 7,
+        "llm_reasoning": "Parent (Broader). 'other operations on stomach' is a vague operations category for the stomach. It may include endoscopic biopsy but is a non-specific, broader grouping that omits the specific procedure and approach, so not equivalent.",
+        "final_score": 2.8,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "2002582",
+          "concept_name": "diagnostic procedures on stomach"
+        }
+      },
+      {
+        "concept_id": "4108616",
+        "concept_name": "examination of body system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 2.0,
+        "llm_rank": 8,
+        "llm_reasoning": "Parent (Broader). 'examination of body system' is an extremely general concept (system-level exam) that subsumes many specific procedures including endoscopic stomach biopsy but omits site, procedure type, and approach. It is the broadest parent here and not equivalent.",
+        "final_score": 2.0,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4004241",
+          "concept_name": "endoscopic biopsy of stomach"
+        }
+      }
+    ]
+  },
+  {
+    "test_index": 3,
+    "id": "2",
+    "entity_name": "Endoscopy of nasal sinus",
+    "input_domain": "Procedure",
+    "row_id": "2",
+    "ground_truth_concept_id": 4010253,
+    "ground_truth_concept_name": "nasal sinus endoscopy",
+    "success": true,
+    "mapping_correct": true,
+    "best_result_domain": "Procedure",
+    "best_concept_id": "4010253",
+    "best_concept_name": "nasal sinus endoscopy",
+    "best_score": 5.0,
+    "stage1_candidates": [
+      {
+        "concept_id": "3313728",
+        "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9999892181299331,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "4234923",
+        "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "elasticsearch_score": 0.9999892181299331,
+        "search_type": "lexical"
+      },
+      {
+        "concept_id": "45912580",
+        "concept_name": "nasal sinus endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "CIEL",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9896058,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "4010253",
+        "concept_name": "nasal sinus endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "elasticsearch_score": 0.9921975,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "3421379",
+        "concept_name": "nasal sinus endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "Nebraska Lexicon",
+        "standard_concept": null,
+        "elasticsearch_score": 0.9834499968119544,
+        "search_type": "combined"
+      }
+    ],
+    "stage2_candidates": [
+      {
+        "concept_id": "4234923",
+        "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "search_type": "lexical",
+        "relation_type": "original",
+        "elasticsearch_score": 0.9999892181299331
+      },
+      {
+        "concept_id": "4010253",
+        "concept_name": "nasal sinus endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "search_type": "semantic",
+        "relation_type": "original",
+        "elasticsearch_score": 0.9921975
+      },
+      {
+        "concept_id": "4338167",
+        "concept_name": "dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Maps to",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "3218579",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4179713",
+        "concept_name": "endoscopic procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4234923",
+          "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4013622",
+        "concept_name": "ear, nose and throat examination",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4149530",
+        "concept_name": "examination of respiratory system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4297085",
+        "concept_name": "respiratory tract evaluation",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4313889",
+        "concept_name": "endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4189601",
+        "concept_name": "nasal sinus procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4334556",
+        "concept_name": "operation on lacrimal sac",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4305536",
+        "concept_name": "creation of anastomosis between lacrimal drainage system and nose",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4159949",
+        "concept_name": "surgical procedure on soft tissue",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "lexical",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "36675054",
+        "concept_name": "procedure on body region",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4013622",
+          "concept_name": "ear, nose and throat examination"
+        }
+      },
+      {
+        "concept_id": "4240345",
+        "concept_name": "physical examination",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4013622",
+          "concept_name": "ear, nose and throat examination"
+        }
+      },
+      {
+        "concept_id": "4108616",
+        "concept_name": "examination of body system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4149530",
+          "concept_name": "examination of respiratory system"
+        }
+      },
+      {
+        "concept_id": "4043017",
+        "concept_name": "procedure on respiratory system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4149530",
+          "concept_name": "examination of respiratory system"
+        }
+      },
+      {
+        "concept_id": "4297090",
+        "concept_name": "evaluation procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4297085",
+          "concept_name": "respiratory tract evaluation"
+        }
+      },
+      {
+        "concept_id": "4306074",
+        "concept_name": "respiratory tract procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4297085",
+          "concept_name": "respiratory tract evaluation"
+        }
+      },
+      {
+        "concept_id": "4139262",
+        "concept_name": "inspection",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4313889",
+          "concept_name": "endoscopy"
+        }
+      },
+      {
+        "concept_id": "4042518",
+        "concept_name": "procedure on upper respiratory tract",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4189601",
+          "concept_name": "nasal sinus procedure"
+        }
+      },
+      {
+        "concept_id": "4040395",
+        "concept_name": "procedure on head",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "search_type": "semantic",
+        "relation_type": "Is a",
+        "elasticsearch_score": 0.0,
+        "original_non_standard": {
+          "concept_id": "4189601",
+          "concept_name": "nasal sinus procedure"
+        }
+      }
+    ],
+    "stage3_candidates": [
+      {
+        "concept_id": "4010253",
+        "concept_name": "nasal sinus endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "llm_score": 5.0,
+        "llm_rank": 1,
+        "llm_reasoning": "Classification: Equivalent. \"nasal sinus endoscopy\" exactly matches the entity's procedure: endoscopy (method) performed on the nasal sinuses (anatomic site). No additional or missing defining attributes. Per rule, an exact semantic match must be chosen as Equivalent.",
+        "final_score": 5.0,
+        "search_type": "semantic"
+      },
+      {
+        "concept_id": "4189601",
+        "concept_name": "nasal sinus procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.9,
+        "llm_rank": 2,
+        "llm_reasoning": "Classification: Parent (Broader). \"nasal sinus procedure\" specifies the anatomic site (nasal sinus) but omits the defining attribute of method (endoscopy). This is a broader concept that fully contains the entity meaning but lacks the procedural method, so it is a Parent (closer parent due to same site).",
+        "final_score": 4.9,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4179713",
+        "concept_name": "endoscopic procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.8,
+        "llm_rank": 3,
+        "llm_reasoning": "Classification: Parent (Broader). \"endoscopic procedure\" specifies the method (endoscopy) but omits the anatomic site (nasal sinus). It is broader than the entity (missing site), so it is a Parent.",
+        "final_score": 4.8,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4234923",
+          "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4042518",
+        "concept_name": "procedure on upper respiratory tract",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.7,
+        "llm_rank": 4,
+        "llm_reasoning": "Classification: Parent (Broader). \"procedure on upper respiratory tract\" names a regional site set that includes nasal sinuses but does not specify the endoscopic method; it is broader (missing method specificity) and therefore a Parent.",
+        "final_score": 4.7,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4189601",
+          "concept_name": "nasal sinus procedure"
+        }
+      },
+      {
+        "concept_id": "4043017",
+        "concept_name": "procedure on respiratory system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.6,
+        "llm_rank": 5,
+        "llm_reasoning": "Classification: Parent (Broader). \"procedure on respiratory system\" is a higher-level procedure category that includes procedures on nasal sinuses but omits the method (endoscopy) and exact site specificity; thus it is a Parent.",
+        "final_score": 4.6,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4149530",
+          "concept_name": "examination of respiratory system"
+        }
+      },
+      {
+        "concept_id": "4306074",
+        "concept_name": "respiratory tract procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.5,
+        "llm_rank": 6,
+        "llm_reasoning": "Classification: Parent (Broader). \"respiratory tract procedure\" is a general category covering procedures anywhere in the respiratory tract; it omits the method (endoscopy) and specific nasal sinus site. Thus it is a Parent concept.",
+        "final_score": 4.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4297085",
+          "concept_name": "respiratory tract evaluation"
+        }
+      },
+      {
+        "concept_id": "4313889",
+        "concept_name": "endoscopy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.4,
+        "llm_rank": 7,
+        "llm_reasoning": "Classification: Parent (Broader). \"endoscopy\" is a very general method-level concept without any anatomic site; it omits the nasal sinus site and is therefore a broad Parent.",
+        "final_score": 4.4,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4159949",
+        "concept_name": "surgical procedure on soft tissue",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.3,
+        "llm_rank": 8,
+        "llm_reasoning": "Classification: Parent (Broader). \"surgical procedure on soft tissue\" is a very general surgical category that may include procedures in many regions; it omits both the endoscopic method and the nasal sinus site, so it is a broad Parent.",
+        "final_score": 4.3,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "36675054",
+        "concept_name": "procedure on body region",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.2,
+        "llm_rank": 9,
+        "llm_reasoning": "Classification: Parent (Broader). \"procedure on body region\" is a top-level broad category that lacks method and specific anatomic site details; it fully contains the entity but is nonspecific, therefore Parent.",
+        "final_score": 4.2,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4013622",
+          "concept_name": "ear, nose and throat examination"
+        }
+      },
+      {
+        "concept_id": "4013622",
+        "concept_name": "ear, nose and throat examination",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.1,
+        "llm_rank": 10,
+        "llm_reasoning": "Classification: Parent (Broader). \"ear, nose and throat examination\" is a broader ENT exam that may include nasal sinus endoscopy but does not specify the endoscopic method or isolate the nasal sinuses as the targeted procedure (missing the defining attribute: endoscopic method and exclusive nasal sinus site). Because an Equivalent exists, this parent must score lower than the Equivalent.",
+        "final_score": 4.1,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4149530",
+        "concept_name": "examination of respiratory system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 4.0,
+        "llm_rank": 11,
+        "llm_reasoning": "Classification: Parent (Broader). \"examination of respiratory system\" is a broader exam of the respiratory system that may include nasal sinus endoscopy but does not state the endoscopic method or restrict to nasal sinuses (missing method/site specificity); therefore Parent.",
+        "final_score": 4.0,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4297085",
+        "concept_name": "respiratory tract evaluation",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.9,
+        "llm_rank": 12,
+        "llm_reasoning": "Classification: Parent (Broader). \"respiratory tract evaluation\" is a broad evaluation category for the respiratory tract; it lacks the defining method (endoscopy) and precise anatomic focus (nasal sinuses), so it is a Parent.",
+        "final_score": 3.9,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4010253",
+          "concept_name": "nasal sinus endoscopy"
+        }
+      },
+      {
+        "concept_id": "4297090",
+        "concept_name": "evaluation procedure",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.8,
+        "llm_rank": 13,
+        "llm_reasoning": "Classification: Parent (Broader). \"evaluation procedure\" is a general evaluation category lacking both the method (endoscopy) and the specific nasal sinus site; thus it is a broad Parent.",
+        "final_score": 3.8,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4297085",
+          "concept_name": "respiratory tract evaluation"
+        }
+      },
+      {
+        "concept_id": "4139262",
+        "concept_name": "inspection",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.7,
+        "llm_rank": 14,
+        "llm_reasoning": "Classification: Parent (Broader). \"inspection\" indicates visual assessment but does not specify endoscopic instrumentation or the precise anatomic site (nasal sinuses). It is broader than the entity (missing endoscopic instrumentation/site), so Parent.",
+        "final_score": 3.7,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4313889",
+          "concept_name": "endoscopy"
+        }
+      },
+      {
+        "concept_id": "4240345",
+        "concept_name": "physical examination",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.6,
+        "llm_rank": 15,
+        "llm_reasoning": "Classification: Parent (Broader). \"physical examination\" is a broad clinical exam category (non-specific method) and does not guarantee endoscopic visualization of the nasal sinuses; it omits the defining method and is a Parent.",
+        "final_score": 3.6,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4013622",
+          "concept_name": "ear, nose and throat examination"
+        }
+      },
+      {
+        "concept_id": "4108616",
+        "concept_name": "examination of body system",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.5,
+        "llm_rank": 16,
+        "llm_reasoning": "Classification: Parent (Broader). \"examination of body system\" is a broad category that may include respiratory/ENT exams but omits explicit endoscopic method and nasal sinus site; therefore it is a Parent.",
+        "final_score": 3.5,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4149530",
+          "concept_name": "examination of respiratory system"
+        }
+      },
+      {
+        "concept_id": "4040395",
+        "concept_name": "procedure on head",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 3.4,
+        "llm_rank": 17,
+        "llm_reasoning": "Classification: Parent (Broader). \"procedure on head\" is an even broader anatomic region; it omits both the method (endoscopy) and specific nasal sinus site focus, so it is a broad Parent.",
+        "final_score": 3.4,
+        "search_type": "semantic",
+        "original_non_standard": {
+          "concept_id": "4189601",
+          "concept_name": "nasal sinus procedure"
+        }
+      },
+      {
+        "concept_id": "4338167",
+        "concept_name": "dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.4,
+        "llm_rank": 18,
+        "llm_reasoning": "Classification: Meaning-changed. \"dacryocystorhinostomy\" (original_concept also dacryocystorhinostomy) is a specific surgical creation of a drainage between lacrimal sac and nose. This is a different, specific surgical operation (different intent and target structures) and does not match an endoscopy of the nasal sinuses. Not a Parent or Equivalent.",
+        "final_score": 1.4,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "3218579",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4334556",
+        "concept_name": "operation on lacrimal sac",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.3,
+        "llm_rank": 19,
+        "llm_reasoning": "Classification: Meaning-changed. \"operation on lacrimal sac\" denotes surgery on the lacrimal sac (different anatomic structure and procedure type). It changes the meaning relative to an endoscopy of the nasal sinus and is not equivalent or a broader parent.",
+        "final_score": 1.3,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4305536",
+        "concept_name": "creation of anastomosis between lacrimal drainage system and nose",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": false,
+        "llm_score": 1.2,
+        "llm_rank": 20,
+        "llm_reasoning": "Classification: Meaning-changed. \"creation of anastomosis between lacrimal drainage system and nose\" describes the specific DCR-type surgical anastomosis; it introduces a different procedure and specific surgical intent/site compared with nasal sinus endoscopy, so it is meaning-changed (narrow/different).",
+        "final_score": 1.2,
+        "search_type": "lexical",
+        "original_non_standard": {
+          "concept_id": "4338167",
+          "concept_name": "dacryocystorhinostomy"
+        }
+      },
+      {
+        "concept_id": "4234923",
+        "concept_name": "endoscopy of nasal sinus with dacryocystorhinostomy",
+        "domain_id": "Procedure",
+        "vocabulary_id": "SNOMED",
+        "standard_concept": "S",
+        "is_original_standard": true,
+        "llm_score": 0.0,
+        "llm_rank": 999,
+        "llm_reasoning": "Not ranked",
+        "final_score": 0.0,
+        "search_type": "lexical"
+      }
+    ]
+  }
+]

@@ -18,7 +18,6 @@ import numpy as np
 class DataSourceType(Enum):
     """Enumeration of supported data source types."""
     LOCAL_CSV = "local_csv"
-    POSTGRES = "postgres"
 
 
 class BaseDataSource(ABC):

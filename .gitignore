@@ -153,3 +153,10 @@ _old/
 
 # Large data files (exceeds GitHub 100MB limit)
 data/
+
+# Evaluation scripts and results (contain non-public study data)
+eval/
+
+# Small data samples shipped with the repository (override *.csv / *.json above)
+!samples/**/*.csv
+!samples/**/*.json

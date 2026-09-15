@@ -1,23 +1,22 @@
 """
-OMOP CDM Indexing Module
+OMOP Vocabulary Indexing Module
 
-This module provides tools for indexing OMOP CDM data into Elasticsearch.
-Supports three data sources: local CSV, PostgreSQL, and Athena API.
+Tools for indexing OMOP vocabulary tables (Athena CSV download) into Elasticsearch.
 
 Components:
-    - data_sources: Data source adapters for different CDM sources
+    - data_sources: Vocabulary CSV reader
     - elasticsearch_indexer: Elasticsearch indexing utilities
     - sapbert_embedder: SapBERT embedding generator
-    - unified_indexer: Main indexer that orchestrates the indexing process
+    - vocabulary_indexer: Main indexer that orchestrates the indexing process
 """
 
 from .elasticsearch_indexer import ElasticsearchIndexer
 from .sapbert_embedder import SapBERTEmbedder
-from .unified_indexer import UnifiedIndexer, create_data_source
+from .vocabulary_indexer import VocabularyIndexer, create_data_source
 
 __all__ = [
     'ElasticsearchIndexer',
     'SapBERTEmbedder',
-    'UnifiedIndexer',
+    'VocabularyIndexer',
     'create_data_source'
 ]

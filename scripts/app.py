@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Streamlit app for local OMOP entity mapping demos."""
+"""Streamlit demo app: map a clinical term to an OMOP Standard Concept."""
 
 import html
 import os
@@ -15,7 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from MapOMOP import DomainID, EntityInput, EntityMappingAPI, ElasticsearchClient, ScoringMode
+from MapOMOP import DomainID, EntityInput, EntityMappingAPI, ElasticsearchClient
 
 load_dotenv(override=False)
 
@@ -123,7 +123,6 @@ def get_mapping_api(
     )
     return EntityMappingAPI(
         es_client=es_client,
-        scoring_mode=ScoringMode.LLM,
         llm_provider="openai",
         llm_model=model or None,
         llm_api_key=openai_api_key,

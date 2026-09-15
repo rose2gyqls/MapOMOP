@@ -1,8 +1,8 @@
 """
-Unified Indexer Module
+Vocabulary Indexer Module
 
-Main indexer that orchestrates OMOP CDM data indexing from multiple sources.
-Supports local CSV and PostgreSQL data sources.
+Main indexer that loads OMOP vocabulary CSV files into Elasticsearch
+(with SapBERT embeddings for concept names).
 
 Robust indexing:
     - Checkpoint file-based resume (records row number, continues from the interruption point)
@@ -26,12 +26,7 @@ from typing import Optional, Dict, List
 import torch
 from tqdm.auto import tqdm
 
-from data_sources import (
-    BaseDataSource,
-    DataSourceType,
-    LocalCSVDataSource,
-    PostgresDataSource
-)
+from data_sources import BaseDataSource, VocabularyCSVDataSource
 from sapbert_embedder import SapBERTEmbedder
 from elasticsearch_indexer import ElasticsearchIndexer
 
@@ -49,8 +44,8 @@ def _resolve_es_port(value: Optional[int]) -> int:
         return 9200
 
 
-class UnifiedIndexer:
-    """Unified indexer for OMOP CDM data."""
+class VocabularyIndexer:
+    """Indexer for OMOP vocabulary tables."""
     
     # Fixed index names
     INDEX_NAMES = {
@@ -76,7 +71,7 @@ class UnifiedIndexer:
         bulk_delay_sec: float = 0.0
     ):
         """
-        Initialize unified indexer.
+        Initialize vocabulary indexer.
         
         Args:
             data_source: Data source instance
@@ -115,7 +110,7 @@ class UnifiedIndexer:
             self.device = "cpu"
         
         self.logger.info("=" * 60)
-        self.logger.info("Initializing Unified Indexer")
+        self.logger.info("Initializing Vocabulary Indexer")
         self.logger.info(f"Data source: {data_source.source_type.value}")
         self.logger.info(
             "Elasticsearch: %s:%s",
@@ -334,7 +329,7 @@ class UnifiedIndexer:
                         # Chunk failed -> abort (restart resumes from this chunk)
                         self.logger.error(
                             f"CONCEPT: Chunk failed at offset {skip_rows + processed}. "
-                            f"Restart with --resume to continue from this position."
+                            "Restart with --resume to continue from this position."
                         )
                         return False
                     
@@ -343,7 +338,7 @@ class UnifiedIndexer:
             
             elapsed = time.time() - start_time
             
-            self.logger.info(f"CONCEPT indexing complete")
+            self.logger.info("CONCEPT indexing complete")
             self.logger.info(f"Processed: {processed:,}, Indexed: {indexed:,}")
             self.logger.info(f"Time: {elapsed/60:.1f} min, Speed: {processed/elapsed:.1f} rows/sec")
             
@@ -387,7 +382,7 @@ class UnifiedIndexer:
             if total == 0:
                 self.logger.error(
                     "The CONCEPT_SMALL file is missing or empty. "
-                    "Run scripts/prepare_concept_small.py first."
+                    "Run scripts/create_concept_small.py first."
                 )
                 return False
             
@@ -445,7 +440,7 @@ class UnifiedIndexer:
                     else:
                         self.logger.error(
                             f"CONCEPT_SMALL: Chunk failed at offset {skip_rows + processed}. "
-                            f"Restart with --resume to continue from this position."
+                            "Restart with --resume to continue from this position."
                         )
                         return False
                     
@@ -455,7 +450,7 @@ class UnifiedIndexer:
             
             elapsed = time.time() - start_time
             
-            self.logger.info(f"CONCEPT_SMALL indexing complete")
+            self.logger.info("CONCEPT_SMALL indexing complete")
             self.logger.info(f"Processed: {processed:,}, Indexed: {indexed:,}")
             self.logger.info(f"Time: {elapsed/60:.1f} min, Speed: {processed/elapsed:.1f} rows/sec")
             
@@ -557,13 +552,13 @@ class UnifiedIndexer:
                     else:
                         self.logger.error(
                             f"RELATIONSHIP: Chunk failed at offset {skip_rows + processed}. "
-                            f"Restart with --resume to continue from this position."
+                            "Restart with --resume to continue from this position."
                         )
                         return False
             
             elapsed = time.time() - start_time
             
-            self.logger.info(f"CONCEPT_RELATIONSHIP indexing complete")
+            self.logger.info("CONCEPT_RELATIONSHIP indexing complete")
             self.logger.info(f"Processed: {processed:,}, Indexed: {indexed:,}, Filtered out: {filtered_out:,}")
             self.logger.info(f"Time: {elapsed/60:.1f} min, Speed: {processed/elapsed:.1f} rows/sec")
             
@@ -588,7 +583,6 @@ class UnifiedIndexer:
         Add only 'Is a' relationships to the existing concept-relationship index.
         Existing data is never deleted (delete_existing=False is fixed).
         """
-        table_key = 'relationship'
         ISA_RELATIONSHIP_IDS = {'Is a'}
         
         self.logger.info("=" * 60)
@@ -658,7 +652,7 @@ class UnifiedIndexer:
             
             elapsed = time.time() - start_time
             
-            self.logger.info(f"CONCEPT_RELATIONSHIP 'Is a' addition complete")
+            self.logger.info("CONCEPT_RELATIONSHIP 'Is a' addition complete")
             self.logger.info(f"Processed: {processed:,}, Indexed: {indexed:,}, Filtered out: {filtered_out:,}")
             self.logger.info(f"Time: {elapsed/60:.1f} min, Speed: {processed/elapsed:.1f} rows/sec")
             
@@ -742,13 +736,13 @@ class UnifiedIndexer:
                     else:
                         self.logger.error(
                             f"SYNONYM: Chunk failed at offset {skip_rows + processed}. "
-                            f"Restart with --resume to continue from this position."
+                            "Restart with --resume to continue from this position."
                         )
                         return False
             
             elapsed = time.time() - start_time
             
-            self.logger.info(f"CONCEPT_SYNONYM indexing complete")
+            self.logger.info("CONCEPT_SYNONYM indexing complete")
             self.logger.info(f"Processed: {processed:,}, Indexed: {indexed:,}")
             self.logger.info(f"Time: {elapsed/60:.1f} min, Speed: {processed/elapsed:.1f} rows/sec")
             
@@ -842,39 +836,23 @@ class UnifiedIndexer:
             torch.cuda.empty_cache()
 
 
-def create_data_source(source_type: str, **kwargs) -> BaseDataSource:
+def create_data_source(data_folder: str, **kwargs) -> BaseDataSource:
     """
-    Factory function to create data source.
-    
+    Create the OMOP vocabulary CSV data source.
+
     Args:
-        source_type: 'local_csv', 'postgres'
-        **kwargs: Data source specific arguments
-        
+        data_folder: Folder containing the vocabulary CSV files
+        **kwargs: Optional file name / delimiter overrides
+
     Returns:
         BaseDataSource instance
     """
-    if source_type == 'local_csv':
-        return LocalCSVDataSource(
-            data_folder=kwargs.get('data_folder'),
-            concept_file=kwargs.get('concept_file', 'CONCEPT.csv'),
-            relationship_file=kwargs.get('relationship_file', 'CONCEPT_RELATIONSHIP.csv'),
-            synonym_file=kwargs.get('synonym_file', 'CONCEPT_SYNONYM.csv'),
-            concept_small_file=kwargs.get('concept_small_file', 'CONCEPT_SMALL.csv'),
-            delimiter=kwargs.get('delimiter', '\t'),
-            relationship_delimiter=kwargs.get('relationship_delimiter', '\t')
-        )
-    
-    elif source_type == 'postgres':
-        return PostgresDataSource(
-            host=kwargs.get('host'),
-            port=kwargs.get('port'),
-            dbname=kwargs.get('dbname'),
-            user=kwargs.get('user'),
-            password=kwargs.get('password'),
-            concept_table=kwargs.get('concept_table'),
-            relationship_table=kwargs.get('relationship_table'),
-            synonym_table=kwargs.get('synonym_table')
-        )
-    
-    else:
-        raise ValueError(f"Unknown source type: {source_type}")
+    return VocabularyCSVDataSource(
+        data_folder=data_folder,
+        concept_file=kwargs.get('concept_file', 'CONCEPT.csv'),
+        relationship_file=kwargs.get('relationship_file', 'CONCEPT_RELATIONSHIP.csv'),
+        synonym_file=kwargs.get('synonym_file', 'CONCEPT_SYNONYM.csv'),
+        concept_small_file=kwargs.get('concept_small_file', 'CONCEPT_SMALL.csv'),
+        delimiter=kwargs.get('delimiter', '\t'),
+        relationship_delimiter=kwargs.get('relationship_delimiter', '\t')
+    )

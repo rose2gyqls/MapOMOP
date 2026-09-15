@@ -1,12 +1,12 @@
 """
 MapOMOP
 
-A 3-stage medical entity mapping system for OMOP CDM.
+A 3-stage pipeline that maps source terms to OMOP CDM Standard Concepts.
 
 Stages:
-    1. Candidate Retrieval: Multi-strategy search (lexical, semantic, combined)
-    2. Standard Collection: Convert non-standard to standard concepts
-    3. Hybrid Scoring: LLM or embedding-based final ranking
+    1. Candidate Retrieval: Lexical, semantic, and combined search
+    2. Standard Concept Collection: Non-standard to Standard Concept conversion
+    3. LLM Scoring: LLM-based final ranking
 
 LLM Providers:
     - OpenAI (gpt-5-mini-2025-08-07, etc.)
@@ -14,7 +14,7 @@ LLM Providers:
 
 Usage:
     from MapOMOP import EntityMappingAPI, EntityInput, DomainID
-    
+
     api = EntityMappingAPI()
     entity = EntityInput(entity_name="aspirin", domain_id=DomainID.DRUG)
     results = api.map_entity(entity)
@@ -33,7 +33,6 @@ from .llm_client import (
     get_llm_client,
     create_llm_client,
 )
-from .mapping_stages import ScoringMode
 from .utils import deduplicate_by_concept, sigmoid_normalize
 
 __version__ = "1.0.0"
@@ -45,8 +44,6 @@ __all__ = [
     "EntityInput",
     "DomainID",
     "MappingResult",
-    # Scoring Mode
-    "ScoringMode",
     # LLM Client
     "LLMClient",
     "LLMProvider",

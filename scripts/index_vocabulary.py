@@ -1,30 +1,29 @@
 #!/usr/bin/env python3
 """
-OMOP CDM indexing script
+OMOP vocabulary indexing script
 
-Edit the configuration values and run, or override them with CLI options.
+Loads OMOP vocabulary CSV files (Athena download) into Elasticsearch.
+Edit the default settings below or override them with CLI options.
 
 Usage:
     # Run with default settings (concept-small, synonym, relationship)
-    python scripts/run_indexing.py
-    
-    # Run with CLI options
-    python scripts/run_indexing.py local_csv --data-folder /path/to/data --tables concept-small synonym
-    python scripts/run_indexing.py postgres --tables concept-small relationship synonym
-    
+    python scripts/index_vocabulary.py
+
+    # Custom data folder / tables
+    python scripts/index_vocabulary.py --data-folder /path/to/vocabulary --tables concept-small synonym
+
     # Test (partial data only)
-    python scripts/run_indexing.py local_csv --max-rows 10000
-    
+    python scripts/index_vocabulary.py --max-rows 10000
+
     # Resume from where it stopped (Checkpoint-based)
-    python scripts/run_indexing.py local_csv --resume
-    python scripts/run_indexing.py local_csv --resume --tables synonym
-    
+    python scripts/index_vocabulary.py --resume
+    python scripts/index_vocabulary.py --resume --tables synonym
+
     # Add only 'Is a' relationships to an existing concept-relationship index (no deletion of existing data)
-    python scripts/run_indexing.py local_csv --add-isa
-    python scripts/run_indexing.py postgres --add-isa
-    
+    python scripts/index_vocabulary.py --add-isa
+
     # Mitigate 429s (wait between bulk requests)
-    python scripts/run_indexing.py local_csv --resume --bulk-delay 1
+    python scripts/index_vocabulary.py --resume --bulk-delay 1
 """
 
 import sys
@@ -42,26 +41,12 @@ load_dotenv(override=False)
 # Default settings (used when no CLI option is given)
 # ============================================================================
 
-# Data source type: 'local_csv' or 'postgres'
-DEFAULT_SOURCE = 'local_csv'
-
 # List of tables to index
 # Options: 'concept-small', 'synonym', 'relationship', 'concept'
 DEFAULT_TABLES = ['concept-small', 'synonym', 'relationship']
 
-# ----------------------------------------------------------------------------
-# Local CSV settings
-# ----------------------------------------------------------------------------
+# Folder containing the vocabulary CSV files
 DEFAULT_DATA_FOLDER = str(Path(__file__).resolve().parent.parent / 'data' / 'omop-cdm')
-
-# ----------------------------------------------------------------------------
-# PostgreSQL settings
-# ----------------------------------------------------------------------------
-DEFAULT_PG_HOST = os.getenv('PG_HOST')
-DEFAULT_PG_PORT = os.getenv('PG_PORT', '5432')
-DEFAULT_PG_DBNAME = os.getenv('PG_DBNAME')
-DEFAULT_PG_USER = os.getenv('PG_USER')
-DEFAULT_PG_PASSWORD = os.getenv('PG_PASSWORD')
 
 # ----------------------------------------------------------------------------
 # Elasticsearch settings
@@ -84,9 +69,9 @@ DEFAULT_CHUNK_SIZE = 10000      # Data chunk size (larger = better GPU utilizati
 # Main code
 # ============================================================================
 
-def setup_logging(source_type: str) -> str:
+def setup_logging() -> str:
     """Configure logging"""
-    log_file = f'indexing_{source_type}_{time.strftime("%Y%m%d_%H%M%S")}.log'
+    log_file = f'indexing_vocabulary_{time.strftime("%Y%m%d_%H%M%S")}.log'
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -101,18 +86,10 @@ def setup_logging(source_type: str) -> str:
 def parse_args():
     """Parse CLI arguments"""
     parser = argparse.ArgumentParser(
-        description='OMOP CDM Elasticsearch indexing',
+        description='OMOP vocabulary Elasticsearch indexing',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    
-    # Data source (optional)
-    parser.add_argument(
-        'source_type', nargs='?',
-        choices=['local_csv', 'postgres'],
-        default=DEFAULT_SOURCE,
-        help=f'Data source type (default: {DEFAULT_SOURCE})'
-    )
-    
+
     # Common options
     parser.add_argument('--tables', nargs='+',
         choices=['concept', 'concept-small', 'relationship', 'synonym'],
@@ -139,7 +116,7 @@ def parse_args():
         help=f'Data chunk size (default: {DEFAULT_CHUNK_SIZE})')
     parser.add_argument('--bulk-delay', type=float, default=0.0,
         help='Wait time between bulk requests (seconds). Use when ES returns 429 (default: 0)')
-    
+
     # Elasticsearch options
     parser.add_argument('--es-host', default=DEFAULT_ES_HOST,
         help='Elasticsearch host (default: ES_SERVER_HOST environment variable)')
@@ -149,101 +126,70 @@ def parse_args():
         help='Elasticsearch user (default: ES_SERVER_USERNAME environment variable)')
     parser.add_argument('--es-password', default=DEFAULT_ES_PASSWORD,
         help='Elasticsearch password (default: ES_SERVER_PASSWORD environment variable)')
-    
-    # Local CSV options
+
+    # Vocabulary CSV options
     parser.add_argument('--data-folder', default=DEFAULT_DATA_FOLDER,
-        help=f'CSV data folder (default: {DEFAULT_DATA_FOLDER})')
-    
-    # PostgreSQL options
-    parser.add_argument('--pg-host', default=DEFAULT_PG_HOST,
-        help='PostgreSQL host (default: PG_HOST environment variable)')
-    parser.add_argument('--pg-port', default=DEFAULT_PG_PORT,
-        help=f'PostgreSQL port (default: PG_PORT environment variable or {DEFAULT_PG_PORT})')
-    parser.add_argument('--pg-dbname', default=DEFAULT_PG_DBNAME,
-        help='PostgreSQL DB name (default: PG_DBNAME environment variable)')
-    parser.add_argument('--pg-user', default=DEFAULT_PG_USER,
-        help='PostgreSQL user (default: PG_USER environment variable)')
-    parser.add_argument('--pg-password', default=DEFAULT_PG_PASSWORD,
-        help='PostgreSQL password (default: PG_PASSWORD environment variable)')
-    
+        help=f'Vocabulary CSV folder (default: {DEFAULT_DATA_FOLDER})')
+
     return parser.parse_args()
 
 
 def main():
     """Main function"""
     args = parse_args()
-    
+
     # Path setup
     _root = Path(__file__).resolve().parent.parent
     sys.path.insert(0, str(_root))
     sys.path.insert(0, str(_root / "indexing"))
     sys.path.insert(0, str(Path(__file__).resolve().parent))
-    
+
     # Logging setup
-    log_file = setup_logging(args.source_type)
+    log_file = setup_logging()
     logger = logging.getLogger(__name__)
-    
+
     print("=" * 70)
-    print("OMOP CDM Elasticsearch indexing")
+    print("OMOP vocabulary Elasticsearch indexing")
     print("=" * 70)
-    print(f"Data source: {args.source_type}")
     print(f"Tables: {args.tables}")
     print(f"Elasticsearch: {args.es_host}:{args.es_port}")
     print(f"GPU: {args.gpu}")
     print(f"Embeddings: {'disabled' if args.no_embeddings else 'enabled'}")
     if args.add_isa:
-        print(f"Mode: ADD-ISA (add only 'Is a' relationships to existing concept-relationship, keep existing data)")
+        print("Mode: ADD-ISA (add only 'Is a' relationships to existing concept-relationship, keep existing data)")
     elif args.resume:
-        print(f"Mode: RESUME (Checkpoint-based resume)")
+        print("Mode: RESUME (Checkpoint-based resume)")
     else:
-        print(f"Mode: FRESH (fresh indexing)")
+        print("Mode: FRESH (fresh indexing)")
     if args.bulk_delay > 0:
         print(f"Bulk delay: {args.bulk_delay}s (429 mitigation)")
     print(f"Log: {log_file}")
     print("=" * 70)
-    
+
     try:
-        from indexing.unified_indexer import UnifiedIndexer, create_data_source
-        
+        from indexing.vocabulary_indexer import VocabularyIndexer, create_data_source
+
         # 1. Create data source
-        if args.source_type == 'local_csv':
-            print(f"\nData folder: {args.data_folder}")
-            
-            # concept-small preprocessing (skipped in --add-isa mode)
-            if 'concept-small' in args.tables and not args.add_isa:
-                print("\n[1/2] Checking CONCEPT_SMALL.csv...")
-                from prepare_concept_small import create_concept_small
-                
-                concept_small_path = Path(args.data_folder) / 'CONCEPT_SMALL.csv'
-                if not concept_small_path.exists():
-                    print("  -> Creating...")
-                    create_concept_small(args.data_folder)
-                else:
-                    print("  -> Already exists (skip)")
-            
-            data_source = create_data_source(
-                'local_csv',
-                data_folder=args.data_folder
-            )
-            
-        elif args.source_type == 'postgres':
-            print(f"\nPostgreSQL: {args.pg_host}:{args.pg_port}/{args.pg_dbname}")
-            print("\n[1/2] Connecting to PostgreSQL...")
-            
-            data_source = create_data_source(
-                'postgres',
-                host=args.pg_host,
-                port=args.pg_port,
-                dbname=args.pg_dbname,
-                user=args.pg_user,
-                password=args.pg_password
-            )
-            print("  -> Connected")
-        
+        print(f"\nData folder: {args.data_folder}")
+
+        # concept-small preprocessing (skipped in --add-isa mode)
+        if 'concept-small' in args.tables and not args.add_isa:
+            print("\n[1/2] Checking CONCEPT_SMALL.csv...")
+            from create_concept_small import create_concept_small
+
+            concept_small_path = Path(args.data_folder) / 'CONCEPT_SMALL.csv'
+            if not concept_small_path.exists():
+                print("  -> Creating...")
+                create_concept_small(args.data_folder)
+            else:
+                print("  -> Already exists (skip)")
+
+        data_source = create_data_source(data_folder=args.data_folder)
+
         # 2. Create and run the indexer
         print("\n[2/2] Elasticsearch indexing...")
-        
-        indexer = UnifiedIndexer(
+
+        indexer = VocabularyIndexer(
             data_source=data_source,
             es_host=args.es_host,
             es_port=args.es_port,
@@ -256,7 +202,7 @@ def main():
             lowercase=not args.no_lowercase,
             bulk_delay_sec=args.bulk_delay
         )
-        
+
         if args.add_isa:
             # Add only 'Is a' relationships to existing concept-relationship (no deletion of existing data)
             success = indexer.index_relationships_isa_only(max_rows=args.max_rows)
@@ -267,7 +213,7 @@ def main():
                 max_rows=args.max_rows,
                 tables=args.tables
             )
-        
+
         # 3. Print results
         print("\n" + "=" * 70)
         print("Results:")
@@ -275,16 +221,16 @@ def main():
             status = "✓ Success" if success else "✗ Failed"
             print(f"  {table}: {status}")
         print("=" * 70)
-        
+
         indexer.cleanup()
-        
+
         if all(results.values()):
             print("\nDone! Indexing succeeded with no missing data.")
             return 0
         else:
             print("\nSome failures. Restart with --resume to continue from the failed part.")
             return 1
-            
+
     except ImportError as e:
         print(f"\nError: {e}")
         print("Need to run pip install -r requirements.txt")

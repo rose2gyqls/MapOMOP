@@ -1,8 +1,9 @@
 """
-Shared utilities for the mapping pipeline.
+Input/output helpers for the mapping CLI (map_source_terms.py).
 
-Common to all data sources (e.g. SNUH, SNOMED):
-- Data source configuration (default paths, preprocessing)
+Common to all source datasets (e.g. SNUH, SNOMED):
+- Dataset registry (default paths, preprocessing)
+- Dataset loaders (CSV row -> mapping input)
 - Logging setup
 - JSON/LOG/XLSX output
 """
@@ -10,7 +11,6 @@ Common to all data sources (e.g. SNUH, SNOMED):
 import json
 import logging
 from dataclasses import asdict, is_dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -82,6 +82,14 @@ SUMMARY_BASE_HEADERS = [
     "Correct",         # number of correct results across the N runs
 ]
 
+# MapOMOP pipeline loggers routed to the mapping log file
+API_LOGGER_NAMES = [
+    "MapOMOP.entity_mapping_api",
+    "MapOMOP.mapping_stages.stage1_candidate_retrieval",
+    "MapOMOP.mapping_stages.stage2_standard_concept_collection",
+    "MapOMOP.mapping_stages.stage3_llm_scoring",
+]
+
 
 def setup_logging(
     output_dir: Path, data_type: str, timestamp: str, console: bool = True
@@ -115,13 +123,7 @@ def setup_logging(
 
     # MapOMOP API loggers: always log to file; console depends on the console flag
     # (in parallel runs the detailed logs go to the file only).
-    for name in [
-        "MapOMOP.entity_mapping_api",
-        "MapOMOP.mapping_stages.stage1_candidate_retrieval",
-        "MapOMOP.mapping_stages.stage2_standard_collection",
-        "MapOMOP.mapping_stages.stage3_hybrid_scoring",
-        "MapOMOP.mapping_validation",
-    ]:
+    for name in API_LOGGER_NAMES:
         api_log = logging.getLogger(name)
         api_log.setLevel(logging.INFO)
         api_log.handlers.clear()
@@ -140,15 +142,8 @@ def setup_worker_logging(log_file_path: str, capture_only: bool = False) -> None
     and returns them instead.
     capture_only=False: write to file and console in real time (not used when workers=1).
     """
-    _API_LOGGER_NAMES = [
-        "MapOMOP.entity_mapping_api",
-        "MapOMOP.mapping_stages.stage1_candidate_retrieval",
-        "MapOMOP.mapping_stages.stage2_standard_collection",
-        "MapOMOP.mapping_stages.stage3_hybrid_scoring",
-        "MapOMOP.mapping_validation",
-    ]
     if capture_only:
-        for name in _API_LOGGER_NAMES:
+        for name in API_LOGGER_NAMES:
             api_log = logging.getLogger(name)
             api_log.setLevel(logging.INFO)
             api_log.handlers.clear()
@@ -166,7 +161,7 @@ def setup_worker_logging(log_file_path: str, capture_only: bool = False) -> None
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
 
-    for name in _API_LOGGER_NAMES:
+    for name in API_LOGGER_NAMES:
         api_log = logging.getLogger(name)
         api_log.setLevel(logging.INFO)
         api_log.handlers.clear()
@@ -187,15 +182,6 @@ class LogCaptureHandler(logging.Handler):
             self.log_list.append(msg)
         except Exception:
             self.handleError(record)
-
-
-API_LOGGER_NAMES = [
-    "MapOMOP.entity_mapping_api",
-    "MapOMOP.mapping_stages.stage1_candidate_retrieval",
-    "MapOMOP.mapping_stages.stage2_standard_collection",
-    "MapOMOP.mapping_stages.stage3_hybrid_scoring",
-    "MapOMOP.mapping_validation",
-]
 
 
 def capture_entity_logs(logger_names: Optional[list[str]] = None, formatter: Optional[logging.Formatter] = None) -> tuple[list, list]:
@@ -323,11 +309,8 @@ def _format_candidates_for_cell(candidates: List[Dict], stage_type: str) -> str:
                     line += f"\n   Original Non-std: {ons.get('concept_name', 'N/A')} (ID: {ons.get('concept_id', 'N/A')})"
         else:
             fin = float(c.get("final_score") or 0)
-            sem = c.get("semantic_similarity")
             line = f"{i}. [{st}] {name} (ID: {cid})\n"
             line += f"   Final: {fin:.1f}"
-            if sem is not None:
-                line += f", Semantic: {sem:.4f}"
             line += f", Standard: {c.get('standard_concept', 'N/A')}, Domain: {c.get('domain_id', 'N/A')}"
 
         lines.append(line)
